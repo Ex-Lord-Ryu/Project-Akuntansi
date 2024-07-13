@@ -34,7 +34,7 @@
                                 <td class="px-4 py-2 text-center">{{ $item->tgl_penjualan }}</td>
                                 <td class="px-4 py-2 text-center">{{ $item->status->nama_status }}</td>
                                 <td class="px-4 py-2 text-center">{{ $item->pengirim->jenis ?? 'N/A' }}</td>
-                                <td class="px-4 py-2 text-center">{{ $item->tgl_pengiriman ?? 'N/A' }}</td>
+                                <td class="px-4 py-2 text-center">{{ $item->tgl_penjualan ?? 'N/A' }}</td>
                                 <td class="px-4 py-2 text-center">
                                     <a href="{{ route('penjualan.show', $item->id) }}" class="btn btn-info">Lihat</a>
                                     <a href="{{ route('penjualan.edit', $item->id) }}" class="btn btn-warning">Edit</a>
@@ -47,19 +47,20 @@
                                 <td class="px-4 py-2 text-center">
                                     <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 2]) }}" class="btn btn-info" 
                                        @if($item->id_status >= 2) disabled @endif>Payment</a>
-                                    <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 3]) }}" class="btn btn-warning" 
-                                       @if($item->id_status >= 3) disabled @endif>Delivered</a>
-                                    <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 4]) }}" class="btn btn-success" 
-                                       @if($item->id_status >= 4) disabled @endif>Shipped</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="mt-4 mb-4">
-                    {{ $penjualan->links() }}
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+                                       <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 3]) }}" class="btn btn-warning" 
+                                        @if($item->id_status >= 3) disabled @endif>Delivered</a>
+                                     <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 4]) }}" class="btn btn-success" 
+                                        @if($item->id_status >= 4) disabled @endif>Shipped</a>
+                                 </td>
+                             </tr>
+                         @endforeach
+                     </tbody>
+                 </table>
+                 <div class="mt-4 mb-4">
+                     {{ $penjualan->links() }}
+                 </div>
+             </div>
+         </div>
+     </div>
+ </x-app-layout>
+ 

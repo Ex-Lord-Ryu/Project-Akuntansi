@@ -74,7 +74,6 @@ Route::delete('/pembelian_item/{pembelian_item}', [PembelianItemController::clas
 Route::post('barang/update-stock/{pembelian}', [BarangController::class, 'updateStockFromPembelian'])->name('barang.updateStockFromPembelian');
 Route::get('pembelian/{pembelian}/updateStatus/{status}', [PembelianController::class, 'updateStatus'])->name('pembelian.updateStatus');
 
-// Penjualan Routes
 Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
 Route::get('/penjualan/create', [PenjualanController::class, 'create'])->name('penjualan.create');
 Route::post('/penjualan', [PenjualanController::class, 'storeWithItems'])->name('penjualan.store');
@@ -82,6 +81,10 @@ Route::get('/penjualan/{penjualan}', [PenjualanController::class, 'show'])->name
 Route::get('/penjualan/{penjualan}/edit', [PenjualanController::class, 'edit'])->name('penjualan.edit');
 Route::put('/penjualan/{penjualan}', [PenjualanController::class, 'update'])->name('penjualan.update');
 Route::delete('/penjualan/{penjualan}', [PenjualanController::class, 'destroy'])->name('penjualan.destroy');
+Route::get('/penjualan/{penjualan}/updateStatus/{status}', [PenjualanController::class, 'updateStatus'])->name('penjualan.updateStatus');
+
+Route::post('penjualan/storeWithItems', [PenjualanController::class, 'storeWithItems'])->name('penjualan.storeWithItems');
+Route::get('penjualan/{penjualan}/status/{status}', [PenjualanController::class, 'updateStatus'])->name('penjualan.updateStatus');
 
 Route::get('/penjualan_item', [PenjualanItemController::class, 'index'])->name('penjualan_item.index');
 Route::get('/penjualan_item/create', [PenjualanItemController::class, 'create'])->name('penjualan_item.create');
@@ -90,10 +93,6 @@ Route::get('/penjualan_item/{penjualan_item}', [PenjualanItemController::class, 
 Route::get('/penjualan_item/{penjualan_item}/edit', [PenjualanItemController::class, 'edit'])->name('penjualan_item.edit');
 Route::put('/penjualan_item/{penjualan_item}', [PenjualanItemController::class, 'update'])->name('penjualan_item.update');
 Route::delete('/penjualan_item/{penjualan_item}', [PenjualanItemController::class, 'destroy'])->name('penjualan_item.destroy');
-
-
-Route::post('penjualan/storeWithItems', [PenjualanController::class, 'storeWithItems'])->name('penjualan.storeWithItems');
-Route::get('penjualan/{penjualan}/status/{status}', [PenjualanController::class, 'updateStatus'])->name('penjualan.updateStatus');
 
 
 require __DIR__.'/auth.php';

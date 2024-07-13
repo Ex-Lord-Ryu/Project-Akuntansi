@@ -34,9 +34,9 @@
                             <td class="px-4 py-2 text-center">{{ $item->harga }}</td>
                             <td class="px-4 py-2 text-center">{{ $item->ppn }}</td>
                             <td class="px-4 py-2 text-center">
-                                <a href="{{ route('penjualan_item.show', $item->id) }}" class="btn btn-info">Lihat</a>
-                                <a href="{{ route('penjualan_item.edit', $item->id) }}" class="btn btn-warning">Edit</a>
-                                <form action="{{ route('penjualan_item.destroy', $item->id) }}" method="POST" style="display:inline-block;">
+                                <a href="{{ route('penjualan_item.show', ['penjualan_item' => $item]) }}" class="btn btn-info">Lihat</a>
+                                <a href="{{ route('penjualan_item.edit', ['penjualan_item' => $item]) }}" class="btn btn-warning">Edit</a>
+                                <form action="{{ route('penjualan_item.destroy', ['penjualan_item' => $item]) }}" method="POST" style="display:inline-block;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger">Hapus</button>

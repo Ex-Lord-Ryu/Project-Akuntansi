@@ -19,6 +19,7 @@
                         <th class="px-4 py-2 text-center">Nama</th>
                         <th class="px-4 py-2 text-center">Stok</th>
                         <th class="px-4 py-2 text-center">Tanggal Pengiriman</th>
+                        <th class="px-4 py-2 text-center">Tanggal Penjualan</th> <!-- New column for Tanggal Penjualan -->
                         <th class="px-4 py-2 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -29,6 +30,7 @@
                             <td class="px-4 py-2 text-center">{{ $item->nama }}</td>
                             <td class="px-4 py-2 text-center">{{ $item->stok }}</td>
                             <td class="px-4 py-2 text-center">{{ $item->tgl_pengiriman ?? 'N/A' }}</td>
+                            <td class="px-4 py-2 text-center">{{ $item->tgl_penjualan ?? 'N/A' }}</td> <!-- Display Tanggal Penjualan -->
                             <td class="px-4 py-2 text-center">
                                 <a href="{{ route('barang.show', $item->id) }}" class="btn btn-info">Lihat</a>
                                 <a href="{{ route('barang.edit', $item->id) }}" class="btn btn-warning">Edit</a>

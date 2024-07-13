@@ -25,8 +25,8 @@ class PenjualanItemController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'penjualan_id' => 'required|exists:penjualans,id',
-            'barang_id' => 'required|exists:barangs,id',
+            'penjualan_id' => 'required|exists:penjualan,id',
+            'barang_id' => 'required|exists:barang,id',
             'qty' => 'required|integer',
             'harga' => 'required|integer',
             'ppn' => 'required|integer',
@@ -34,7 +34,7 @@ class PenjualanItemController extends Controller
 
         PenjualanItem::create($request->all());
         return redirect()->route('penjualan_item.index')
-            ->with('success', 'Penjualan Item created successfully.');
+                         ->with('success', 'Penjualan Item created successfully.');
     }
 
     public function show(PenjualanItem $penjualan_item)
@@ -52,8 +52,8 @@ class PenjualanItemController extends Controller
     public function update(Request $request, PenjualanItem $penjualan_item)
     {
         $request->validate([
-            'penjualan_id' => 'required|exists:penjualans,id',
-            'barang_id' => 'required|exists:barangs,id',
+            'penjualan_id' => 'required|exists:penjualan,id',
+            'barang_id' => 'required|exists:barang,id',
             'qty' => 'required|integer',
             'harga' => 'required|integer',
             'ppn' => 'required|integer',
@@ -61,13 +61,13 @@ class PenjualanItemController extends Controller
 
         $penjualan_item->update($request->all());
         return redirect()->route('penjualan_item.index')
-            ->with('success', 'Penjualan Item updated successfully.');
+                         ->with('success', 'Penjualan Item updated successfully.');
     }
 
     public function destroy(PenjualanItem $penjualan_item)
     {
         $penjualan_item->delete();
         return redirect()->route('penjualan_item.index')
-            ->with('success', 'Penjualan Item deleted successfully.');
+                         ->with('success', 'Penjualan Item deleted successfully.');
     }
 }

@@ -24,7 +24,7 @@ class Barang extends Model
 
     public function penjualanItems()
     {
-        return $this->hasMany(PenjualanItem::class, 'id_barang');
+        return $this->hasMany(PenjualanItem::class, 'barang_id');
     }
 
     public function getTglPengirimanAttribute()

@@ -34,7 +34,6 @@ class PenjualanController extends Controller
             'tgl_penjualan' => 'required|date',
             'id_status' => 'required|exists:statuses,id',
             'id_pengirim' => 'nullable|exists:pengirims,id',
-            'tgl_pengiriman' => 'nullable|date',
             'items' => 'required|array',
             'items.*.id_barang' => 'required|exists:barang,id',
             'items.*.qty' => 'required|integer',
@@ -47,22 +46,23 @@ class PenjualanController extends Controller
             'tgl_penjualan' => $request->tgl_penjualan,
             'id_status' => $request->id_status,
             'id_pengirim' => $request->id_pengirim,
-            'tgl_pengiriman' => $request->tgl_pengiriman,
         ]);
 
         foreach ($request->items as $item) {
             PenjualanItem::create([
-                'id_penjualan' => $penjualan->id,
-                'id_barang' => $item['id_barang'],
+                'penjualan_id' => $penjualan->id,
+                'barang_id' => $item['id_barang'],
                 'qty' => $item['qty'],
                 'harga' => $item['harga'],
                 'ppn' => $item['ppn'],
             ]);
 
-            // Update the stock and set the delivery date
-            $barang = Barang::find($item['id_barang']);
-            $barang->stok -= $item['qty']; // Subtract stock for sales
-            $barang->save();
+            if ($penjualan->id_status == 4) {
+                $barang = Barang::find($item['id_barang']);
+                $barang->stok -= $item['qty']; // Subtract stock for sales
+                $barang->tgl_penjualan = $request->tgl_penjualan; // Set the sale date
+                $barang->save();
+            }
         }
 
         return redirect()->route('penjualan.index')->with('success', 'Penjualan dan Item berhasil disimpan.');
@@ -90,12 +90,22 @@ class PenjualanController extends Controller
             'id_pengirim' => 'nullable|exists:pengirims,id',
         ]);
 
-        // Update only the fields that are allowed to be updated
+        $previousStatus = $penjualan->id_status;
+
         $penjualan->update([
             'id_pelanggan' => $request->id_pelanggan,
             'id_status' => $request->id_status,
             'id_pengirim' => $request->id_pengirim,
         ]);
+
+        if ($previousStatus != 4 && $penjualan->id_status == 4) {
+            foreach ($penjualan->penjualanItems as $item) {
+                $barang = Barang::find($item->barang_id);
+                $barang->stok -= $item->qty; // Subtract stock for sales
+                $barang->tgl_penjualan = $penjualan->tgl_penjualan; // Set the sale date
+                $barang->save();
+            }
+        }
 
         return redirect()->route('penjualan.index')->with('success', 'Penjualan updated successfully.');
     }
@@ -109,15 +119,22 @@ class PenjualanController extends Controller
     public function updateStatus(Penjualan $penjualan, $status)
     {
         if ($penjualan->id_status < $status) {
+            $previousStatus = $penjualan->id_status;
             $penjualan->id_status = $status;
             $penjualan->save();
-        }
 
-        if ($status == 4) {
-            foreach ($penjualan->penjualanItems as $item) {
-                $barang = Barang::find($item->id_barang);
-                $barang->stok -= $item->qty; // Subtract stock when status is 'Shipped'
-                $barang->save();
+            if ($previousStatus != 4 && $status == 4) {
+                foreach ($penjualan->penjualanItems as $item) {
+                    $barang = Barang::find($item->barang_id);
+                    if ($barang) {
+                        $barang->stok -= $item->qty; // Subtract stock for sales
+                        $barang->tgl_penjualan = $penjualan->tgl_penjualan; // Set the sale date
+                        $barang->save();
+                    } else {
+                        // Debugging output
+                        dd('Barang not found', $item);
+                    }
+                }
             }
         }
 
