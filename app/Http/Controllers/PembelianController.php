@@ -59,7 +59,7 @@ class PembelianController extends Controller
                 'ppn' => $item['ppn'],
             ]);
 
-            if ($pembelian->id_status == 4) {
+            if ($pembelian->id_status == 5) {
                 $barang = Barang::find($item['id_barang']);
                 $barang->stok += $item['qty'];
                 $barang->tgl_pengiriman = $request->tgl_pengiriman;
@@ -100,8 +100,8 @@ class PembelianController extends Controller
             'id_pengirim' => $request->id_pengirim,
         ]);
 
-        if ($previousStatus != 4 && $pembelian->id_status == 4) {
-            // Update stock and set delivery date when status changes to "shipped" (4)
+        if ($previousStatus != 5 && $pembelian->id_status == 5) {
+            // Update stock and set delivery date when status changes to "shipped" (5)
             foreach ($pembelian->items as $item) {
                 $barang = Barang::find($item->id_barang);
                 $barang->stok += $item->qty;
@@ -128,7 +128,7 @@ class PembelianController extends Controller
             $pembelian->save();
 
             // Update stock and set delivery date if status changes to "shipped"
-            if ($previousStatus != 4 && $status == 4) {
+            if ($previousStatus != 5 && $status == 5) {
                 foreach ($pembelian->items as $item) {
                     $barang = Barang::find($item->id_barang);
                     $barang->stok += $item->qty;

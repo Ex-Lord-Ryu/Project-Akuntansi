@@ -57,7 +57,7 @@ class PenjualanController extends Controller
                 'ppn' => $item['ppn'],
             ]);
 
-            if ($penjualan->id_status == 4) {
+            if ($penjualan->id_status == 5) {
                 $barang = Barang::find($item['id_barang']);
                 $barang->stok -= $item['qty']; // Subtract stock for sales
                 $barang->tgl_penjualan = $request->tgl_penjualan; // Set the sale date
@@ -98,7 +98,7 @@ class PenjualanController extends Controller
             'id_pengirim' => $request->id_pengirim,
         ]);
 
-        if ($previousStatus != 4 && $penjualan->id_status == 4) {
+        if ($previousStatus != 5 && $penjualan->id_status == 5) {
             foreach ($penjualan->penjualanItems as $item) {
                 $barang = Barang::find($item->barang_id);
                 $barang->stok -= $item->qty; // Subtract stock for sales
@@ -123,7 +123,7 @@ class PenjualanController extends Controller
             $penjualan->id_status = $status;
             $penjualan->save();
 
-            if ($previousStatus != 4 && $status == 4) {
+            if ($previousStatus != 5 && $status == 5) {
                 foreach ($penjualan->penjualanItems as $item) {
                     $barang = Barang::find($item->barang_id);
                     if ($barang) {

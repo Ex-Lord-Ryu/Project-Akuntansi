@@ -10,10 +10,11 @@ class StatusSeeder extends Seeder
     public function run()
     {
         DB::table('statuses')->insert([
-            ['nama_status' => 'Dalam Proses'],
-            ['nama_status' => 'Payment'],
-            ['nama_status' => 'Delivered'],
-            ['nama_status' => 'Shipped']
+            ['nama_status' => 'Pilih Status'],
+            ['nama_status' => 'On Process'],
+            ['nama_status' => 'Shipped'],
+            ['nama_status' => 'Cancel'],
+            ['nama_status' => 'Delivered']
         ]);
     }
 }

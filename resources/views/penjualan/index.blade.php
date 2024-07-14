@@ -45,11 +45,11 @@
                                     </form>
                                 </td>
                                 <td class="px-4 py-2 text-center">
-                                    <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 2]) }}" class="btn btn-info" 
+                                    <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 3]) }}" class="btn btn-info" 
                                        @if($item->id_status >= 2) disabled @endif>Payment</a>
-                                       <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 3]) }}" class="btn btn-warning" 
+                                       <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 4]) }}" class="btn btn-warning" 
                                         @if($item->id_status >= 3) disabled @endif>Delivered</a>
-                                     <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 4]) }}" class="btn btn-success" 
+                                     <a href="{{ route('penjualan.updateStatus', ['penjualan' => $item->id, 'status' => 5]) }}" class="btn btn-success" 
                                         @if($item->id_status >= 4) disabled @endif>Shipped</a>
                                  </td>
                              </tr>
