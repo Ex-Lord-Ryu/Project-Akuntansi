@@ -22,8 +22,11 @@
                     <label for="harga" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga</label>
                     <input type="number" name="harga" id="harga" class="form-control mt-1 block w-full" value="{{ $barang->harga }}" required>
                 </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="btn btn-success">Update</button>
+                <div class="flex justify-between items-center">
+                    <a href="{{ route('barang.index') }}" class="btn btn-dark">Back</a>
+                    <div class="flex space-x-2">
+                        <button type="submit" class="btn btn-success">Update</button>
+                    </div>
                 </div>
             </form>
         </div>

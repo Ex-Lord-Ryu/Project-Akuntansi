@@ -5,6 +5,8 @@
         </h2>
     </x-slot>
 
+    <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
+
     <div class="container mx-auto px-4">
         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
             <form action="{{ route('pengirim.store') }}" method="POST">
@@ -13,8 +15,11 @@
                     <label for="jenis" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis</label>
                     <input type="text" name="jenis" id="jenis" class="form-control mt-1 block w-full" required>
                 </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="btn btn-success">Simpan</button>
+                <div class="flex justify-between items-center">
+                    <a href="{{ route('pengirim.index') }}" class="btn btn-dark">Back</a>
+                    <div class="flex space-x-2">
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </div>
                 </div>
             </form>
         </div>

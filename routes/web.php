@@ -2,11 +2,14 @@
 
 use App\Models\PenjualanItem;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StokController;
+use App\Http\Controllers\WarnaController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PengirimController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PenjualanController;
@@ -28,6 +31,10 @@ Route::get('/', function () {
     return view('auth/login');
 });
 
+Route::get('/awokwko', function () {
+    return view('auth/register');
+});
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -38,16 +45,32 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
+
+
 
 Route::resource('barang', BarangController::class);
+
+
+Route::get('pelanggan/create-from-penjualan', [PelangganController::class, 'createFromPenjualan'])->name('pelanggan.createFromPenjualan');
+Route::post('pelanggan/store-from-penjualan', [PelangganController::class, 'storeFromPenjualan'])->name('pelanggan.storeFromPenjualan');
 Route::resource('pelanggan', PelangganController::class);
+
+
 Route::resource('pembelian', PembelianController::class);
 Route::resource('pembelian_item', PembelianItemController::class);
 Route::resource('pengirim', PengirimController::class);
 Route::resource('penjualan', PenjualanController::class);
 Route::resource('penjualan_item', PenjualanItemController::class);
 Route::resource('status', StatusController::class);
+
+Route::get('vendor/create-from-pembelian', [VendorController::class, 'createFromPembelian'])->name('vendor.createFromPembelian');
+Route::post('vendor/store-from-pembelian', [VendorController::class, 'storeFromPembelian'])->name('vendor.storeFromPembelian');
 Route::resource('vendor', VendorController::class);
+
+Route::resource('stok', StokController::class);
+Route::resource('warna', WarnaController::class);
 
 Route::model('penjualan_item', PenjualanItem::class);
 

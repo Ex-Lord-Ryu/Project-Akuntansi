@@ -8,13 +8,14 @@ use App\Models\Barang;
 use App\Models\Pelanggan;
 use App\Models\Pengirim;
 use App\Models\Status;
+use App\Models\Stok;
 use Illuminate\Http\Request;
 
 class PenjualanController extends Controller
 {
     public function index()
     {
-        $penjualan = Penjualan::with('pelanggan', 'pengirim', 'status')->paginate(10);
+        $penjualan = Penjualan::with('pelanggan', 'pengirim', 'status')->orderBy('id', 'desc')->paginate(10);
         return view('penjualan.index', compact('penjualan'));
     }
 
@@ -23,8 +24,8 @@ class PenjualanController extends Controller
         $pelanggans = Pelanggan::all();
         $pengirims = Pengirim::all();
         $statuses = Status::all();
-        $barangs = Barang::all();
-        return view('penjualan.create', compact('pelanggans', 'pengirims', 'statuses', 'barangs'));
+        $stokAvailable = Stok::where('status', 'available')->get();
+        return view('penjualan.create', compact('pelanggans', 'pengirims', 'statuses', 'stokAvailable'));
     }
 
     public function storeWithItems(Request $request)
@@ -35,11 +36,15 @@ class PenjualanController extends Controller
             'id_status' => 'required|exists:statuses,id',
             'id_pengirim' => 'nullable|exists:pengirims,id',
             'items' => 'required|array',
-            'items.*.id_barang' => 'required|exists:barang,id',
-            'items.*.qty' => 'required|integer',
+            'items.*.stok_id' => 'required|exists:stok,id',
             'items.*.harga' => 'required|numeric',
-            'items.*.ppn' => 'required|integer'
         ]);
+
+        // Cek apakah pelanggan telah digunakan dalam penjualan sebelumnya
+        $existingPenjualan = Penjualan::where('id_pelanggan', $request->id_pelanggan)->first();
+        if ($existingPenjualan) {
+            return redirect()->route('penjualan.create')->with('error', 'Pelanggan ini sudah pernah digunakan. Silakan buat pelanggan baru.');
+        }
 
         $penjualan = Penjualan::create([
             'id_pelanggan' => $request->id_pelanggan,
@@ -49,19 +54,18 @@ class PenjualanController extends Controller
         ]);
 
         foreach ($request->items as $item) {
-            PenjualanItem::create([
-                'penjualan_id' => $penjualan->id,
-                'barang_id' => $item['id_barang'],
-                'qty' => $item['qty'],
-                'harga' => $item['harga'],
-                'ppn' => $item['ppn'],
-            ]);
+            $stok = Stok::find($item['stok_id']);
 
-            if ($penjualan->id_status == 5) {
-                $barang = Barang::find($item['id_barang']);
-                $barang->stok -= $item['qty']; // Subtract stock for sales
-                $barang->tgl_penjualan = $request->tgl_penjualan; // Set the sale date
-                $barang->save();
+            if ($stok && $stok->id_barang) {
+                PenjualanItem::create([
+                    'id_penjualan' => $penjualan->id,
+                    'id_barang' => $stok->id_barang,
+                    'id_stok' => $stok->id,
+                    'id_warna' => $stok->id_warna,
+                    'no_rangka' => $stok->no_rangka,
+                    'no_mesin' => $stok->no_mesin,
+                    'harga' => $item['harga'],
+                ]);
             }
         }
 
@@ -78,8 +82,8 @@ class PenjualanController extends Controller
         $pelanggans = Pelanggan::all();
         $pengirims = Pengirim::all();
         $statuses = Status::all();
-        $barangs = Barang::all();
-        return view('penjualan.edit', compact('penjualan', 'pelanggans', 'pengirims', 'statuses', 'barangs'));
+        $stokAvailable = Stok::where('status', 'available')->get();
+        return view('penjualan.edit', compact('penjualan', 'pelanggans', 'pengirims', 'statuses', 'stokAvailable'));
     }
 
     public function update(Request $request, Penjualan $penjualan)
@@ -98,12 +102,11 @@ class PenjualanController extends Controller
             'id_pengirim' => $request->id_pengirim,
         ]);
 
-        if ($previousStatus != 5 && $penjualan->id_status == 5) {
+        if ($previousStatus != 4 && $penjualan->id_status == 4) {
             foreach ($penjualan->penjualanItems as $item) {
-                $barang = Barang::find($item->barang_id);
-                $barang->stok -= $item->qty; // Subtract stock for sales
-                $barang->tgl_penjualan = $penjualan->tgl_penjualan; // Set the sale date
-                $barang->save();
+                $stok = Stok::find($item->id_stok);
+                $stok->status = 'sold';
+                $stok->save();
             }
         }
 
@@ -112,6 +115,12 @@ class PenjualanController extends Controller
 
     public function destroy(Penjualan $penjualan)
     {
+        foreach ($penjualan->penjualanItems as $item) {
+            $stok = Stok::find($item->id_stok);
+            $stok->status = 'available';
+            $stok->save();
+        }
+
         $penjualan->delete();
         return redirect()->route('penjualan.index')->with('success', 'Penjualan deleted successfully.');
     }
@@ -123,17 +132,11 @@ class PenjualanController extends Controller
             $penjualan->id_status = $status;
             $penjualan->save();
 
-            if ($previousStatus != 5 && $status == 5) {
+            if ($previousStatus != 4 && $status == 4) {
                 foreach ($penjualan->penjualanItems as $item) {
-                    $barang = Barang::find($item->barang_id);
-                    if ($barang) {
-                        $barang->stok -= $item->qty; // Subtract stock for sales
-                        $barang->tgl_penjualan = $penjualan->tgl_penjualan; // Set the sale date
-                        $barang->save();
-                    } else {
-                        // Debugging output
-                        dd('Barang not found', $item);
-                    }
+                    $stok = Stok::find($item->id_stok);
+                    $stok->status = 'sold';
+                    $stok->save();
                 }
             }
         }

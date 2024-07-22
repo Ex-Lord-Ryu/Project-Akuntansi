@@ -38,8 +38,11 @@
                     <label for="provinsi" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Provinsi</label>
                     <input type="text" name="provinsi" id="provinsi" class="form-control mt-1 block w-full" value="{{ $pelanggan->provinsi }}" required>
                 </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="btn btn-success">Update</button>
+                <div class="flex justify-between items-center">
+                    <a href="{{ route('pelanggan.index') }}" class="btn btn-dark">Back</a>
+                    <div class="flex space-x-2">
+                        <button type="submit" class="btn btn-success">Update</button>
+                    </div>
                 </div>
             </form>
         </div>

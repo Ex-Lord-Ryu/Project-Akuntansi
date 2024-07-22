@@ -14,9 +14,10 @@ class PembelianItem extends Model
     protected $fillable = [
         'id_pembelian',
         'id_barang',
-        'qty',
-        'harga',
-        'ppn'
+        'id_warna',
+        'no_rangka',
+        'no_mesin',
+        'harga'
     ];
 
     public function pembelian()
@@ -27,5 +28,9 @@ class PembelianItem extends Model
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'id_barang');
+    }
+
+    public function warna() {
+        return $this->belongsTo(Warna::class, 'id_warna');
     }
 }

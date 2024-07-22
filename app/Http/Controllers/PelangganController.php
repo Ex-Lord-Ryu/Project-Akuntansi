@@ -9,30 +9,29 @@ class PelangganController extends Controller
 {
     public function index()
     {
-        $pelanggan = Pelanggan::all();
+        $pelanggan = Pelanggan::paginate(10);
         return view('pelanggan.index', compact('pelanggan'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        if ($request->has('from')) {
+            session(['pelanggan_create_from' => $request->input('from')]);
+        }
         return view('pelanggan.create');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'tgl_lahir' => 'required|date',
-            'no_hp' => 'nullable|string',
-            'email' => 'nullable|email',
+            'nama' => 'required|string',
             'alamat' => 'required|string',
-            'wilayah' => 'required|string',
-            'provinsi' => 'required|string',
         ]);
 
         Pelanggan::create($request->all());
-        return redirect()->route('pelanggan.index')
-                         ->with('success', 'Pelanggan created successfully.');
+
+        $redirectTo = session('pelanggan_create_from', route('pelanggan.index'));
+        return redirect($redirectTo)->with('success', 'Pelanggan created successfully.');
     }
 
     public function show(Pelanggan $pelanggan)
@@ -48,24 +47,41 @@ class PelangganController extends Controller
     public function update(Request $request, Pelanggan $pelanggan)
     {
         $request->validate([
-            'nama' => 'required',
-            'tgl_lahir' => 'required|date',
-            'no_hp' => 'nullable|string',
-            'email' => 'nullable|email',
+            'nama' => 'required|string',
             'alamat' => 'required|string',
-            'wilayah' => 'required|string',
-            'provinsi' => 'required|string',
         ]);
 
         $pelanggan->update($request->all());
-        return redirect()->route('pelanggan.index')
-                         ->with('success', 'Pelanggan updated successfully.');
+        return redirect()->route('pelanggan.index')->with('success', 'Pelanggan updated successfully.');
     }
 
     public function destroy(Pelanggan $pelanggan)
     {
         $pelanggan->delete();
-        return redirect()->route('pelanggan.index')
-                         ->with('success', 'Pelanggan deleted successfully.');
+        return redirect()->route('pelanggan.index')->with('success', 'Pelanggan deleted successfully.');
+    }
+
+    // Fungsi untuk menampilkan form pelanggan dari penjualan
+    public function createFromPenjualan()
+    {
+        return view('pelanggan.create_from_penjualan');
+    }
+
+    // Fungsi untuk menyimpan pelanggan baru dari form penjualan
+    public function storeFromPenjualan(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'alamat' => 'required|string|max:255',
+            'tgl_lahir' => 'required|date',
+            'no_hp' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:255',
+            'wilayah' => 'required|string|max:255',
+            'provinsi' => 'required|string|max:255',
+        ]);
+
+        Pelanggan::create($request->all());
+
+        return redirect()->route('penjualan.create')->with('success', 'Pelanggan berhasil ditambahkan.');
     }
 }

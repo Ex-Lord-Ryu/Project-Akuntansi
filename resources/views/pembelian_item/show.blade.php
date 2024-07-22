@@ -8,16 +8,15 @@
     <div class="container mx-auto px-4">
         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
             <div class="mb-4">
-                <h3 class="text-lg font-semibold">Pembelian ID: {{ $pembelian_item->id_pembelian }}</h3>
+                <h3 class="text-lg font-semibold">Pembelian ID: {{ $pembelianItem->id_pembelian }}</h3>
             </div>
             <div class="mb-4">
-                <p><strong>Barang: </strong>{{ $pembelian_item->barang->nama }}</p>
-                <p><strong>Qty: </strong>{{ $pembelian_item->qty }}</p>
-                <p><strong>Harga: </strong>{{ $pembelian_item->harga }}</p>
-                <p><strong>PPN: </strong>{{ $pembelian_item->ppn }}%</p>
+                <p><strong>Barang: </strong>{{ $pembelianItem->barang->nama }}</p>
+                <p><strong>Warna: </strong>{{ $pembelianItem->warna->warna ?? 'N/A' }}</p>
+                <p><strong>Harga: </strong>{{ $pembelianItem->harga }}</p>
             </div>
-            <div class="flex justify-end">
-                <a href="{{ route('pembelian_item.index') }}" class="btn btn-primary">Kembali</a>
+            <div class="flex justify-between items-center">
+                <a href="{{ route('pembelian_item.index') }}" class="btn btn-dark">Back</a>
             </div>
         </div>
     </div>

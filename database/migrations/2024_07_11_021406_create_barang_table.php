@@ -11,8 +11,6 @@ class CreateBarangTable extends Migration
         Schema::create('barang', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->integer('stok');
-            $table->date('tgl_pengiriman')->nullable();
             $table->timestamps();
         });
     }

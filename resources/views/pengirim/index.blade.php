@@ -5,6 +5,8 @@
         </h2>
     </x-slot>
 
+    <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
+
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-center mt-6">
             <h1 class="text-2xl font-bold">Daftar Pengirim</h1>

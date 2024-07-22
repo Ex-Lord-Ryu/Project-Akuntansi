@@ -17,10 +17,10 @@
                     <label for="stok" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stok</label>
                     <input type="number" name="stok" id="stok" class="form-control mt-1 block w-full" required>
                 </div>
-                <div class="mb-4">
+                {{-- <div class="mb-4">
                     <label for="harga" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga</label>
                     <input type="number" name="harga" id="harga" class="form-control mt-1 block w-full" required>
-                </div>
+                </div> --}}
                 <div class="flex justify-end">
                     <button type="submit" class="btn btn-success">Simpan</button>
                 </div>

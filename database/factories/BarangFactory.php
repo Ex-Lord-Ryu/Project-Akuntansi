@@ -43,10 +43,10 @@ class BarangFactory extends Factory
                 'Honda XL750 Transalp Standard',
                 'Honda Rebel 1100 Standard'
             ]),
-            'stok' => $this->faker->numberBetween(0, 100),
-            'harga' => $this->faker->randomElement([
-               0
-            ]),
+            // 'stok' => $this->faker->numberBetween(0, 100),
+            // 'harga' => $this->faker->randomElement([
+            //    0
+            // ]),
         ];
     }
 }

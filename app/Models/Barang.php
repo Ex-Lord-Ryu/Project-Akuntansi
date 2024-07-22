@@ -12,9 +12,7 @@ class Barang extends Model
     protected $table = 'barang';
 
     protected $fillable = [
-        'nama',
-        'stok',
-        'harga',
+        'nama'
     ];
 
     public function pembelianItems()
@@ -24,18 +22,19 @@ class Barang extends Model
 
     public function penjualanItems()
     {
-        return $this->hasMany(PenjualanItem::class, 'barang_id');
-    }
-
-    public function getTglPengirimanAttribute()
-    {
-        $latestPembelianItem = $this->pembelianItems()->latest()->first();
-        return $latestPembelianItem ? $latestPembelianItem->pembelian->tgl_pengiriman : null;
-    }
-
-    public function getTglPenjualanAttribute()
-    {
-        $latestPenjualanItem = $this->penjualanItems()->latest()->first();
-        return $latestPenjualanItem ? $latestPenjualanItem->penjualan->tgl_penjualan : null;
+        return $this->hasMany(PenjualanItem::class, 'id_barang');
     }
 }
+
+//     public function getTglPengirimanAttribute()
+//     {
+//         $latestPembelianItem = $this->pembelianItems()->latest()->first();
+//         return $latestPembelianItem ? $latestPembelianItem->pembelian->tgl_pengiriman : null;
+//     }
+
+//     public function getTglPenjualanAttribute()
+//     {
+//         $latestPenjualanItem = $this->penjualanItems()->latest()->first();
+//         return $latestPenjualanItem ? $latestPenjualanItem->penjualan->tgl_penjualan : null;
+//     }
+// }

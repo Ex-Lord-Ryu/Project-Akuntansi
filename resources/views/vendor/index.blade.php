@@ -5,10 +5,15 @@
         </h2>
     </x-slot>
 
+    <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
+
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-center mt-6">
             <h1 class="text-2xl font-bold">Daftar Vendor</h1>
-            <a href="{{ route('vendor.create') }}" class="btn btn-primary">Tambah Vendor</a>
+            <a href="{{ route('vendor.create') }}" class="btn btn-light border-custom">Tambah Vendor</a>
+        </div>
+        <div class="flex justify-end mt-4">
+            <a href="{{ route('pembelian.index') }}" class="btn btn-light border-custom ">Daftar Pembelian</a>
         </div>
 
         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8"> <!-- Added mb-8 class here -->
@@ -28,13 +33,15 @@
                             <td class="py-2">{{ $item->nama }}</td>
                             <td class="px-4 py-2">{{ $item->alamat }}</td>
                             <td class="px-4 py-2">
-                                <a href="{{ route('vendor.show', $item->id) }}" class="btn btn-info">Lihat</a>
-                                <a href="{{ route('vendor.edit', $item->id) }}" class="btn btn-warning">Edit</a>
-                                <form action="{{ route('vendor.destroy', $item->id) }}" method="POST" style="display:inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">Hapus</button>
-                                </form>
+                                <div class="flex flex-col items-center">
+                                    <a href="{{ route('vendor.edit', $item->id) }}" class="btn btn-dark mb-2 btn-action">Edit</a>
+                                    <form action="{{ route('vendor.destroy', $item->id) }}" method="POST" 
+                                        class="mb-2" onclick="return ConfirmDelete()">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-light btn-action">Hapus</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -48,3 +55,11 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+    function ConfirmDelete() {
+        return confirm('Data yang dihapus tidak dapat direstorasi');
+    }
+</script>
+
+

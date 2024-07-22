@@ -9,23 +9,32 @@ class PenjualanItem extends Model
 {
     use HasFactory;
 
-    protected $table = 'penjualan_item'; // Ensure the correct table name
+    protected $table = 'penjualan_item';
 
     protected $fillable = [
-        'penjualan_id',
-        'barang_id',
-        'qty',
+        'id_penjualan',
+        'id_barang',
+        'id_stok',
+        'id_warna',
+        'no_rangka',
+        'no_mesin',
         'harga',
-        'ppn',
     ];
+
+    
 
     public function penjualan()
     {
-        return $this->belongsTo(Penjualan::class, 'penjualan_id');
+        return $this->belongsTo(Penjualan::class, 'id_penjualan');
+    }
+
+    public function stok()
+    {
+        return $this->belongsTo(Stok::class, 'id_stok');
     }
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'barang_id');
+        return $this->belongsTo(Barang::class, 'id_barang');
     }
 }

@@ -32,9 +32,27 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="qty" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Qty</label>
-                    <input type="number" name="qty" id="qty" class="form-control mt-1 block w-full @error('qty') is-invalid @enderror" required>
-                    @error('qty')
+                    <label for="id_warna" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Warna</label>
+                    <select name="id_warna" id="id_warna" class="form-control mt-1 block w-full @error('id_warna') is-invalid @enderror">
+                        @foreach ($warnas as $warna)
+                            <option value="{{ $warna->id }}">{{ $warna->warna }}</option>
+                        @endforeach
+                    </select>
+                    @error('id_warna')
+                        <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-4">
+                    <label for="no_rangka" class="block text-sm font-medium text-gray-700 dark:text-gray-300">No Rangka</label>
+                    <input type="text" name="no_rangka" id="no_rangka" class="form-control mt-1 block w-full @error('no_rangka') is-invalid @enderror">
+                    @error('no_rangka')
+                        <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-4">
+                    <label for="no_mesin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">No Mesin</label>
+                    <input type="text" name="no_mesin" id="no_mesin" class="form-control mt-1 block w-full @error('no_mesin') is-invalid @enderror">
+                    @error('no_mesin')
                         <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
                     @enderror
                 </div>
@@ -45,15 +63,11 @@
                         <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="mb-4">
-                    <label for="ppn" class="block text-sm font-medium text-gray-700 dark:text-gray-300">PPN</label>
-                    <input type="number" name="ppn" id="ppn" class="form-control mt-1 block w-full @error('ppn') is-invalid @enderror" value="10" required>
-                    @error('ppn')
-                        <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="btn btn-success">Simpan</button>
+                <div class="flex justify-between items-center">
+                    <a href="{{ route('pembelian_item.index') }}" class="btn btn-dark">Back</a>
+                    <div class="flex space-x-2">
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </div>
                 </div>
             </form>
         </div>

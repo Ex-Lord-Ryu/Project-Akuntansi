@@ -5,69 +5,86 @@
         </h2>
     </x-slot>
 
-    <div class="container mx-auto px-4">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form action="{{ route('penjualan_item.store') }}" method="POST">
-                    @csrf
-                    <!-- ID Penjualan -->
-                    <div class="mb-4">
-                        <label for="id_penjualan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">ID Penjualan</label>
-                        <select name="id_penjualan" id="id_penjualan" class="form-select mt-1 block w-full">
-                            @foreach ($penjualans as $penjualan)
-                                <option value="{{ $penjualan->id }}">{{ $penjualan->id }}</option>
-                            @endforeach
-                        </select>
-                        @error('id_penjualan')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Barang -->
-                    <div class="mb-4">
-                        <label for="id_barang" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Barang</label>
-                        <select name="id_barang" id="id_barang" class="form-select mt-1 block w-full">
-                            @foreach ($barangs as $barang)
-                                <option value="{{ $barang->id }}">{{ $barang->nama }}</option>
-                            @endforeach
-                        </select>
-                        @error('id_barang')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Qty -->
-                    <div class="mb-4">
-                        <label for="qty" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Qty</label>
-                        <input type="number" name="qty" id="qty" class="form-input mt-1 block w-full" required>
-                        @error('qty')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Harga -->
-                    <div class="mb-4">
-                        <label for="harga" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga</label>
-                        <input type="number" name="harga" id="harga" class="form-input mt-1 block w-full" required>
-                        @error('harga')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- PPN -->
-                    <div class="mb-4">
-                        <label for="ppn" class="block text-sm font-medium text-gray-700 dark:text-gray-300">PPN</label>
-                        <input type="number" name="ppn" id="ppn" class="form-input mt-1 block w-full" required>
-                        @error('ppn')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="flex items-center justify-end mt-4">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
+    <div class="container mx-auto px-4 py-6">
+        <form action="{{ route('penjualan_item.store') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label for="id_penjualan" class="block text-sm font-medium text-gray-700">Penjualan</label>
+                <select name="id_penjualan" id="id_penjualan" class="form-select mt-1 block w-full">
+                    @foreach ($penjualans as $penjualan)
+                        <option value="{{ $penjualan->id }}" {{ old('id_penjualan') == $penjualan->id ? 'selected' : '' }}>
+                            {{ $penjualan->id }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('id_penjualan')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
-        </div>
+
+            <div class="mb-4">
+                <label for="id_barang" class="block text-sm font-medium text-gray-700">Barang</label>
+                <select name="id_barang" id="id_barang" class="form-select mt-1 block w-full">
+                    @foreach ($barangs as $barang)
+                        <option value="{{ $barang->id }}" {{ old('id_barang') == $barang->id ? 'selected' : '' }}>
+                            {{ $barang->nama }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('id_barang')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="id_stok" class="block text-sm font-medium text-gray-700">Stok</label>
+                <select name="id_stok" id="id_stok" class="form-select mt-1 block w-full">
+                    @foreach ($stoks as $stok)
+                        <option value="{{ $stok->id }}" {{ old('id_stok') == $stok->id ? 'selected' : '' }}>
+                            {{ $stok->id }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('id_stok')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="id_warna" class="block text-sm font-medium text-gray-700">Warna</label>
+                <input type="text" name="id_warna" id="id_warna" class="form-input mt-1 block w-full" value="{{ old('id_warna') }}">
+                @error('id_warna')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="no_rangka" class="block text-sm font-medium text-gray-700">No Rangka</label>
+                <input type="text" name="no_rangka" id="no_rangka" class="form-input mt-1 block w-full" value="{{ old('no_rangka') }}">
+                @error('no_rangka')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="no_mesin" class="block text-sm font-medium text-gray-700">No Mesin</label>
+                <input type="text" name="no_mesin" id="no_mesin" class="form-input mt-1 block w-full" value="{{ old('no_mesin') }}">
+                @error('no_mesin')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="harga" class="block text-sm font-medium text-gray-700">Harga</label>
+                <input type="number" name="harga" id="harga" class="form-input mt-1 block w-full" value="{{ old('harga') }}" required>
+                @error('harga')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-light border-custom">Simpan Penjualan Item</button>
+            </div>
+        </form>
     </div>
 </x-app-layout>

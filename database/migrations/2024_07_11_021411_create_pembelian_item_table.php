@@ -10,11 +10,10 @@ class CreatePembelianItemTable extends Migration
     {
         Schema::create('pembelian_item', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_pembelian')->constrained('pembelian')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('id_barang')->constrained('barang')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->integer('qty');
-            $table->bigInteger('harga');
-            $table->integer('ppn')->default(11);
+            $table->foreignId('id_pembelian')->constrained('pembelian')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('id_barang')->constrained('barang')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('id_warna', 4)->nullable()->constrained('warna')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->bigInteger('harga')->nullable();
             $table->timestamps();
         });
     }
@@ -24,4 +23,3 @@ class CreatePembelianItemTable extends Migration
         Schema::dropIfExists('pembelian_item');
     }
 }
-

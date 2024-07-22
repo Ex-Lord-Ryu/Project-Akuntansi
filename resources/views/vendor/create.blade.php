@@ -5,7 +5,19 @@
         </h2>
     </x-slot>
 
+    <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
+
     <div class="container mx-auto px-4">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
             <form action="{{ route('vendor.store') }}" method="POST">
                 @csrf
@@ -17,8 +29,11 @@
                     <label for="alamat" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</label>
                     <input type="text" name="alamat" id="alamat" class="form-control mt-1 block w-full" required>
                 </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="btn btn-success">Simpan</button>
+                <div class="flex justify-between items-center">
+                    <a href="{{ session('vendor_create_from', route('vendor.index')) }}" class="btn btn-dark">Back</a>
+                    <div class="flex space-x-2">
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </div>
                 </div>
             </form>
         </div>

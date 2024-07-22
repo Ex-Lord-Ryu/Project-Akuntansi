@@ -5,10 +5,15 @@
         </h2>
     </x-slot>
 
+    <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
+
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-center mt-6">
             <h1 class="text-2xl font-bold">Daftar Pelanggan</h1>
-            <a href="{{ route('pelanggan.create') }}" class="btn btn-primary">Tambah Pelanggan</a>
+            <a href="{{ route('pelanggan.create') }}" class="btn btn-light border-custom">Tambah Pelanggan</a>
+        </div>
+        <div class="flex justify-end mt-4">
+            <a href="{{ route('penjualan.index') }}" class="btn btn-light border-custom mr-2">Daftar Penjualan</a>
         </div>
 
         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -30,28 +35,48 @@
                     <tbody class="bg-white dark:bg-gray-800">
                         @foreach ($pelanggan as $item)
                             <tr class="border-t">
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->id }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->nama }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->tgl_lahir }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->no_hp }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->email }}</td>
-                                <td class="px-4 py-2 text-center">{{ $item->alamat }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->wilayah }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->provinsi }}</td>
+                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                    style="max-width: 50px;">{{ $item->id }}</td>
+                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                    style="max-width: 150px;">{{ $item->nama }}</td>
+                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                    style="max-width: 100px;">{{ $item->tgl_lahir }}</td>
+                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                    style="max-width: 100px;">{{ $item->no_hp }}</td>
+                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                    style="max-width: 200px;">{{ $item->email }}</td>
+                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                    style="max-width: 200px;">{{ $item->alamat }}</td>
+                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                    style="max-width: 150px;">{{ $item->wilayah }}</td>
+                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                                    style="max-width: 150px;">{{ $item->provinsi }}</td>
                                 <td class="px-4 py-2 text-center">
-                                    <a href="{{ route('pelanggan.show', $item->id) }}" class="btn btn-info">Lihat</a>
-                                    <a href="{{ route('pelanggan.edit', $item->id) }}" class="btn btn-warning">Edit</a>
-                                    <form action="{{ route('pelanggan.destroy', $item->id) }}" method="POST" style="display:inline-block;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Hapus</button>
-                                    </form>
+                                    <div class="flex flex-col items-center">
+                                        <a href="{{ route('pelanggan.show', $item->id) }}"
+                                            class="btn btn-dark mb-2 btn-action">Lihat</a>
+                                        <a href="{{ route('pelanggan.edit', $item->id) }}"
+                                            class="btn btn-dark mb-2 btn-action">Edit</a>
+                                        <form action="{{ route('pelanggan.destroy', $item->id) }}" method="POST"
+                                            class="MB-2" onclick="return confirmDelete()">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-Light btn-action">Hapus</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+                {{ $pelanggan->links() }} <!-- Add pagination links here -->
             </div>
         </div>
     </div>
 </x-app-layout>
+
+<script>
+    function confirmDelete() {
+        return confirm('Data yang dihapus tidak dapat direstorasi?');
+    }
+</script>

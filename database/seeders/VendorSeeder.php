@@ -3,15 +3,18 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Vendor;
 
 class VendorSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
-        \App\Models\Vendor::factory(0)->create();
-
-        DB::table('vendors')->insert([
+        $vendor = [
             ['nama' => 'PT. ASTRA HONDA MOTOR', 'alamat' => 'Jl. Kalimantan, Danau Indah, Kec. Cikarang Bar., Kabupaten Bekasi, Jawa Barat 17530'],
             ['nama' => 'PT. ASTRA HONDA MOTOR PLANT 3A CIKARANG', 'alamat' => 'P432+F34, Jl. Kalimantan, Gandamekar, Kec. Cikarang Bar., Kabupaten Bekasi, Jawa Barat 17530'],
             ['nama' => 'PT. ASTRA HONDA MOTOR SUNTER', 'alamat' => 'Jl. Laksda Jl. Yos Sudarso No.2, RW.9, Sunter Jaya, Kec. Tj. Priok, Jkt Utara, Daerah Khusus Ibukota Jakarta 14350'],
@@ -29,6 +32,10 @@ class VendorSeeder extends Seeder
             ['nama' => 'ASTRA HONDA MOTOR YAYASAN', 'alamat' => 'No.1, Jl. Yos Sudarso, RT.2/RW.9, Sunter Jaya, Kec. Tj. Priok, Jkt Utara, Daerah Khusus Ibukota Jakarta 14360'],
             ['nama' => 'ASTRA HONDA DEALER', 'alamat' => 'Jl. Raya Mangga Besar No.132E, RW.1, Kartini, Kecamatan Sawah Besar, Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta 10750'],
             ['nama' => 'ASTRA HONDA BEKASI DEALER', 'alamat' => 'Jl. Caman Raya No.26, RT.008/RW.001, Jatibening, Kec. Pd. Gede, Kota Bks, Jawa Barat 17412']
-        ]);
+        ];
+
+        foreach ($vendor as $v) {
+            Vendor::create($v);
+        }
     }
 }
