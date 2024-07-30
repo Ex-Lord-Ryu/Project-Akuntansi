@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Warna;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Barang extends Model
 {
@@ -12,7 +13,8 @@ class Barang extends Model
     protected $table = 'barang';
 
     protected $fillable = [
-        'nama'
+        'nama',
+        'image',
     ];
 
     public function pembelianItems()
@@ -23,6 +25,16 @@ class Barang extends Model
     public function penjualanItems()
     {
         return $this->hasMany(PenjualanItem::class, 'id_barang');
+    }
+
+    public function warna()
+    {
+        return $this->hasMany(Warna::class, 'id_barang');
+    }
+    
+    public function stok()
+    {
+        return $this->hasMany(Stok::class, 'id_barang');
     }
 }
 

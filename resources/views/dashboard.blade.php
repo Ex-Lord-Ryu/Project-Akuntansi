@@ -6,150 +6,66 @@
     </x-slot>
 
     <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Add your links here -->
-                    </div>
+    <style>
+        .card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-body {
+            flex: 1;
+        }
+    </style>
 
-                    <!-- Year Selector -->
-                    <div class="hidden">
-                        <div class="year-selector">
-                            <select id="yearSelector" multiple>
-                                <!-- Options will be populated dynamically -->
-                            </select>
+    <div class="container mx-auto px-4 py-6">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">Available Stock</h3>
+            <div class="row">
+                @foreach ($stokGrouped as $barangNama => $data)
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100" onclick="window.location='{{ route('barang.detail', $data['items']->first()->id_barang) }}';">
+                            @php $item = $data['items']->first(); @endphp
+                            <img src="{{ asset('storage/' . $item->barang->image) }}" class="card-img-top" alt="{{ $barangNama }}" onerror="this.onerror=null;this.src='{{ asset('assets/images/default.jpg') }}';">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $barangNama }}</h5>
+                                <p class="card-text">Warna: {{ $data['colors'] }}</p>
+                                <p class="card-text">
+                                    Harga: 
+                                    @if ($data['latestPrice'] == 0)
+                                        -
+                                    @else
+                                        {{ 'Rp' . number_format($data['latestPrice'], 0, ',', '.') }}
+                                    @endif
+                                </p>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Yearly Chart -->
-                    <div class="chart-container">
-                        <h3 class="chart-title">Yearly Stok Data</h3>
-                        <div class="canvas-wrapper">
-                            <canvas id="yearlyChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Monthly Chart -->
-                    <div class="chart-container">
-                        <h3 class="chart-title">Monthly Stok Data</h3>
-                        <div class="canvas-wrapper">
-                            <canvas id="monthlyChart"></canvas>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
 </x-app-layout>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const yearSelector = document.getElementById('yearSelector');
-        const currentYear = new Date().getFullYear();
-
-        // Populate year selector with the last 10 years
-        for (let year = currentYear; year >= currentYear - 10; year--) {
-            const option = document.createElement('option');
-            option.value = year;
-            option.textContent = year;
-            yearSelector.appendChild(option);
-        }
-
-        // Ensure at least 5 years are selected by default
-        Array.from(yearSelector.options).slice(0, 5).forEach(option => option.selected = true);
-
-        // Fetch data and initialize charts
-        function fetchDataAndRenderCharts(years) {
-            fetch(`{{ url('dashboard/data') }}?years=${years.join(',')}`)
-                .then(response => response.json())
-                .then(data => {
-                    renderCharts(data);
-                });
-        }
-
-        // Render charts with fetched data
-        function renderCharts(data) {
-            // Monthly Data
-            const monthlyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
-                'Dec'
-            ];
-            const monthlyDatasets = data.map((d, index) => ({
-                label: `Year ${d.year}`,
-                data: monthlyLabels.map((label, monthIndex) => {
-                    const found = d.monthly.find(m => m.month - 1 === monthIndex);
-                    return found ? found.count : 0;
-                }),
-                backgroundColor: `rgba(${index * 25 % 255}, ${index * 75 % 255}, ${index * 125 % 255}, 0.2)`,
-                borderColor: `rgba(${index * 25 % 255}, ${index * 75 % 255}, ${index * 125 % 255}, 1)`,
-                borderWidth: 1
-            }));
-
-            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-            new Chart(monthlyCtx, {
-                type: 'bar',
-                data: {
-                    labels: monthlyLabels,
-                    datasets: monthlyDatasets
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Yearly Data
-            const yearlyLabels = data.map(d => d.year);
-            const yearlyCounts = data.map(d => d.yearly.reduce((acc, val) => acc + val.count, 0));
-
-            const yearlyCtx = document.getElementById('yearlyChart').getContext('2d');
-            new Chart(yearlyCtx, {
-                type: 'bar',
-                data: {
-                    labels: yearlyLabels,
-                    datasets: [{
-                        label: 'Yearly Stok Data',
-                        data: yearlyCounts,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Initial fetch and render
-        const initialYears = Array.from(yearSelector.selectedOptions).map(option => option.value);
-        fetchDataAndRenderCharts(initialYears);
-
-        // Fetch and render charts when year changes
-        yearSelector.addEventListener('change', function() {
-            const selectedYears = Array.from(this.selectedOptions).map(option => option.value);
-            if (selectedYears.length >= 5) {
-                fetchDataAndRenderCharts(selectedYears);
-            } else {
-                alert('Please select at least 5 years.');
-            }
-        });
-    });
-</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

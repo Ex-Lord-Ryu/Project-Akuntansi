@@ -7,9 +7,16 @@ use Illuminate\Http\Request;
 
 class VendorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $vendors = Vendor::paginate(10);
+        $query = Vendor::query();
+
+        if ($request->has('search')) {
+            $query->where('nama', 'like', '%' . $request->search . '%')
+                  ->orWhere('alamat', 'like', '%' . $request->search . '%');
+        }
+
+        $vendors = $query->paginate(10);
         return view('vendor.index', compact('vendors'));
     }
 

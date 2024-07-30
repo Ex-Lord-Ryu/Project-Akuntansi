@@ -19,10 +19,15 @@ class Pelanggan extends Model
         'alamat',
         'wilayah',
         'provinsi',
+        'user_id'
     ];
 
     public function penjualans()
     {
         return $this->hasMany(Penjualan::class, 'id_pelanggan');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

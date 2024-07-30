@@ -5,69 +5,126 @@
         </h2>
     </x-slot>
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center mt-6">
-            <h1 class="text-2xl font-bold">Daftar Stok</h1>
-            {{-- <a href="{{ route('stok.create') }}" class="btn btn-light">Tambah Stok</a> --}}
-        </div>
-        <div class="flex justify-end mt-4">
-            <a href="{{ route('pembelian.index') }}" class="btn btn-light border-custom mr-2">Daftar Pembelian</a>
-            <a href="{{ route('pembelian_item.index') }}" class="btn btn-light border-custom mr-2">Daftar Pembelian
-                Item</a>
-            <a href="{{ route('barang.index') }}" class="btn btn-light border-custom mr-2">Daftar Barang</a>
-        </div>
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
-        <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <table class="table-auto w-full">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr class="text-center">
-                        <th class="px-4 py-2">ID</th>
-                        {{-- <th class="px-4 py-2">ID PMB</th>
-                        <th class="px-4 py-2">ID PMB Item</th> --}}
-                        <th class="px-4 py-2">Nama Barang</th>
-                        <th class="px-4 py-2">Warna</th>
-                        <th class="px-4 py-2">No Rangka</th>
-                        <th class="px-4 py-2">No Mesin</th>
-                        <th class="px-4 py-2">TGL_PNM</th>
-                        <th class="px-4 py-2">Update Barang</th>
-                        <th class="px-4 py-2">Harga</th>
-                        <th class="px-4 py-2">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800">
-                    @foreach ($stok as $item)
-                        <tr class="border-t text-center">
-                            <td class="px-4 py-2">{{ $item->id }}</td>
-                            {{-- <td class="px-4 py-2">{{ $item->id_pembelian }}</td>
-                            <td class="px-4 py-2">{{ $item->id_pembelian_item }}</td> --}}
-                            <td class="px-4 py-2">{{ $item->barang->nama }}</td>
-                            <td class="px-4 py-2">{{ $item->warna->warna ?? 'N/A' }}</td>
-                            <td class="px-4 py-2">{{ $item->no_rangka }}</td>
-                            <td class="px-4 py-2">{{ $item->no_mesin }}</td>
-                            <td class="px-4 py-2">{{ $item->tgl_penerimaan }}</td>
-                            <td class="px-4 py-2">{{ $item->status}}</td>
-                            <td class="px-4 py-2">{{ $item->harga }}</td>
-                            <td class="px-4 py-2">
-                                <div class="flex flex-col items-center">
-                                    <a href="{{ route('stok.show', $item->id) }}"
-                                        class="btn btn-dark mb-2 btn-action">Lihat</a>
-                                    <a href="{{ route('stok.edit', $item->id) }}"
-                                        class="btn btn-dark mb-2 btn-action">Edit</a>
-                                    <form action="{{ route('stok.destroy', $item->id) }}" method="POST" class="mb-2"
-                                        onclick="return confirmDelete()">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-light btn-action">Hapus</button>
-                                    </form>
-                                </div>
-                            </td>
+        @if (session('popup_error'))
+            <div class="alert alert-danger">
+                {{ session('popup_error') }}
+            </div>
+        @endif
+
+        <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="flex justify-between mb-4">
+                <div class="flex justify-start space-x-2">
+                    <button id="view-button" class="btn btn-light border-custom" disabled>
+                        <i class="fas fa-eye"></i> Lihat
+                    </button>
+                    <button id="edit-button" class="btn btn-light border-custom" disabled>
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button id="delete-button" class="btn btn-light border-custom" disabled>
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <form action="{{ route('stok.index') }}" method="GET" class="flex items-center">
+                        <input type="text" name="search" placeholder="Cari nama barang, no rangka, no mesin..."
+                            value="{{ request()->query('search') }}" class="form-input rounded-l border-0">
+                        <button type="submit" class="btn btn-light border-custom rounded-r ml-2">
+                            <i class="fas fa-search"></i> Cari
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 text-center">
+                    <thead>
+                        <tr>
+                            <th
+                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                ID
+                            </th>
+                            <th
+                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Nama Barang
+                            </th>
+                            <th
+                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Warna
+                            </th>
+                            <th
+                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                No Rangka
+                            </th>
+                            <th
+                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                No Mesin
+                            </th>
+                            <th
+                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Tanggal Penerimaan
+                            </th>
+                            <th
+                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Update
+                            </th>
+                            <th
+                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Harga
+                            </th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <div class="mt-4 mb-4">
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200" id="table-body">
+                        @foreach ($stok as $item)
+                            <tr data-id="{{ $item->id }}" class="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td
+                                    class="px-6 py-4 whitespace-no-wrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $item->id }}
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-no-wrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $item->barang->nama }}
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-no-wrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $item->warna->warna ?? 'N/A' }}
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-no-wrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $item->no_rangka }}
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-no-wrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $item->no_mesin }}
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-no-wrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $item->tgl_penerimaan }}
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-no-wrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $item->status }}
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-no-wrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ 'Rp ' . number_format($item->harga, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
                 {{ $stok->links() }}
             </div>
         </div>
@@ -78,4 +135,52 @@
     function confirmDelete() {
         return confirm('Data yang dihapus tidak dapat direstorasi?');
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableBody = document.getElementById('table-body');
+        let selectedRowId = null;
+
+        tableBody.addEventListener('click', function(event) {
+            const rows = tableBody.getElementsByTagName('tr');
+            for (let row of rows) {
+                row.classList.remove('bg-blue-100', 'text-bold', 'border-l-4', 'border-blue-500');
+            }
+
+            const selectedRow = event.target.closest('tr');
+            selectedRow.classList.add('bg-blue-100', 'text-bold', 'border-l-4', 'border-blue-500');
+            selectedRowId = selectedRow.getAttribute('data-id');
+
+            document.getElementById('view-button').disabled = false;
+            document.getElementById('edit-button').disabled = false;
+            document.getElementById('delete-button').disabled = false;
+        });
+
+        document.getElementById('view-button').addEventListener('click', function() {
+            if (selectedRowId) {
+                window.location.href = `/stok/${selectedRowId}`;
+            }
+        });
+
+        document.getElementById('edit-button').addEventListener('click', function() {
+            if (selectedRowId) {
+                window.location.href = `/stok/${selectedRowId}/edit`;
+            }
+        });
+
+        document.getElementById('delete-button').addEventListener('click', function() {
+            if (selectedRowId) {
+                if (confirm('Data yang dihapus tidak dapat direstorasi?')) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/stok/${selectedRowId}`;
+                    form.innerHTML = `
+                        @csrf
+                        @method('DELETE')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        });
+    });
 </script>

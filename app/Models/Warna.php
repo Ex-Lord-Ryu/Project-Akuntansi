@@ -29,6 +29,11 @@ class Warna extends Model
         return $this->hasMany(PenjualanItem::class, 'id_warna');
     }
 
+    public function barang()
+    {
+        return $this->hasMany(Barang::class, 'id_warna');
+    }
+
     public function stoks()
     {
         return $this->hasMany(Stok::class, 'id_warna');

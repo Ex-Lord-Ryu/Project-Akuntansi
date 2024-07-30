@@ -11,11 +11,11 @@ class CreatePembelianTable extends Migration
         Schema::create('pembelian', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_vendor')->constrained('vendors')->cascadeOnUpdate();
-            $table->dateTime('tgl_pembelian');
+            $table->date('tgl_pembelian');
             $table->foreignId('id_status')->constrained('statuses')->cascadeOnUpdate(); // Periksa nama tabel yang dirujuk
             $table->foreignId('id_pengirim')->nullable()->constrained('pengirims')->cascadeOnUpdate();
-            $table->dateTime('tgl_pengiriman')->nullable();
-            $table->dateTime('tgl_penerimaan')->nullable();
+            $table->date('tgl_pengiriman')->nullable();
+            $table->date('tgl_penerimaan')->nullable();
             $table->timestamps();
         });
     }

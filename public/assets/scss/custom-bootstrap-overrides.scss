@@ -1,0 +1,10 @@
+// custom-bootstrap-overrides.scss
+
+.bootstrap-wrapper .border {
+    border: 1px solid #dee2e6 !important;
+}
+
+// Exclude x-layout from being affected by Bootstrap border styles
+:not(.x-layout) .border {
+    border: 1px solid #dee2e6 !important;
+}

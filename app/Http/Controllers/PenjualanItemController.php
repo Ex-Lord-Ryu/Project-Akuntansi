@@ -10,10 +10,25 @@ use Illuminate\Http\Request;
 
 class PenjualanItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $penjualan_items = PenjualanItem::with('penjualan', 'barang', 'stok')->orderBy('id', 'desc')->paginate(10);
-        return view('penjualan_item.index', compact('penjualan_items'));
+        $query = PenjualanItem::with('barang', 'stok', 'warna', 'penjualan')->orderBy('id', 'desc');
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->whereHas('barang', function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%");
+            })
+                ->orWhereHas('stok', function ($q) use ($search) {
+                    $q->where('no_rangka', 'like', "%{$search}%");
+                })
+                ->orWhere('no_rangka', 'like', "%{$search}%")
+                ->orWhere('no_mesin', 'like', "%{$search}%")
+                ->orWhere('id_penjualan', 'like', "%{$search}%");
+        }
+
+        $penjualanItems = $query->paginate(10);
+        return view('penjualan_item.index', compact('penjualanItems'));
     }
 
     public function create()
@@ -49,10 +64,13 @@ class PenjualanItemController extends Controller
         return redirect()->route('penjualan_item.index')->with('success', 'Penjualan Item berhasil ditambahkan.');
     }
 
-    public function show(PenjualanItem $penjualan_item)
+    public function show(Penjualan $penjualan)
     {
-        return view('penjualan_item.show', compact('penjualan_item'));
+        $penjualan->load('penjualanItems'); // Memuat relasi penjualanItems
+        return view('penjualan.show', compact('penjualan'));
     }
+
+
 
     public function edit(PenjualanItem $penjualan_item)
     {

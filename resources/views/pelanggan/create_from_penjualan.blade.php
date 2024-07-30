@@ -35,7 +35,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="no_hp" class="block text-sm font-medium text-gray-700 dark:text-gray-300">No HP</label>
-                    <input type="text" name="no_hp" id="no_hp" class="form-control mt-1 block w-full">
+                    <input type="number" name="no_hp" id="no_hp" class="form-control mt-1 block w-full">
                 </div>
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>

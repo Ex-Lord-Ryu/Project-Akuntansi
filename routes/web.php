@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\PenjualanItem;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\WarnaController;
 use App\Http\Controllers\BarangController;
@@ -16,107 +16,67 @@ use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\PembelianItemController;
 use App\Http\Controllers\PenjualanItemController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
+// Public route
 Route::get('/', function () {
-    return view('auth/login');
-});
+    return view('welcome');
+})->name('welcome');
 
-Route::get('/awokwko', function () {
-    return view('auth/register');
-});
+// Routes that require authentication
+Route::middleware(['auth'])->group(function () {
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    // Routes for user
+    Route::middleware(['isUser'])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('dashboard', [DashboardController::class, 'userDashboard'])->name('dashboard');
+        Route::post('dashboard/store', [DashboardController::class, 'storePurchase'])->name('storePurchase');
+        Route::get('/purchase-history', [DashboardController::class, 'purchaseHistory'])->name('purchase.history');
+        Route::get('/pelanggan/create', [PelangganController::class, 'create'])->name('pelanggan.create');
+        Route::post('/pelanggan/store', [PelangganController::class, 'store'])->name('pelanggan.store');
+        Route::get('/penjualan/create', [PenjualanController::class, 'create'])->name('penjualan.create');
+        Route::get('pelanggan/create-from-penjualan', [PelangganController::class, 'createFromPenjualan'])->name('pelanggan.createFromPenjualan');
+        Route::post('pelanggan/store-from-penjualan', [PelangganController::class, 'storeFromPenjualan'])->name('pelanggan.storeFromPenjualan');
+        Route::post('/penjualan/store', [PenjualanController::class, 'storeWithItems'])->name('penjualan.storeWithItems');
+        Route::get('/riwayat-penjualan', [PenjualanController::class, 'riwayatPenjualan'])->name('penjualan.riwayat');
+        Route::resource('pembelian_items', PembelianItemController::class);
+        Route::post('/penjualan/{penjualan}/status/{status}', [PenjualanController::class, 'updateStatus'])->name('penjualan.updateStatus');
+    });
 
-Route::middleware('auth')->group(function () {
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Routes for admin
+    Route::middleware('admin')->group(function () {
+        Route::get('/admin/dashboard', [DashboardController::class, 'adminIndex'])->name('admin.dashboard');
+        Route::resource('pembelian', PembelianController::class);
+        Route::post('pembelian/storeWithItems', [PembelianController::class, 'storeWithItems'])->name('pembelian.storeWithItems');
+        Route::post('/pembelian/{pembelian}/status/{status}', [PembelianController::class, 'updateStatus'])->name('pembelian.updateStatus');
+        Route::resource('vendor', VendorController::class);
+        Route::resource('penjualan', PenjualanController::class)->except(['create', 'store']);
+        Route::post('/penjualan/{penjualan}/status/{status}', [PenjualanController::class, 'updateStatus'])->name('penjualan.updateStatus');
+        Route::resource('pelanggan', PelangganController::class)->except(['create', 'store']);
+        Route::resource('pembelian_item', PembelianItemController::class);
+        Route::resource('pembelian_items', PembelianItemController::class);
+        Route::resource('pengirim', PengirimController::class);
+        Route::resource('penjualan_item', PenjualanItemController::class);
+        Route::resource('status', StatusController::class);
+        Route::resource('barang', BarangController::class);
+        Route::resource('stok', StokController::class);
+        Route::resource('warna', WarnaController::class);
+    });
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
+// Route for viewing barang details (auth middleware added)
+Route::get('/barang/{id}/detail', [StokController::class, 'showDetail'])->name('barang.detail')->middleware('auth');
 
+// Vendor routes
+Route::get('vendor/create-from-pembelian', [VendorController::class, 'createFromPembelian'])->name('vendor.createFromPembelian')->middleware('auth');
+Route::post('vendor/store-from-pembelian', [VendorController::class, 'storeFromPembelian'])->name('vendor.storeFromPembelian')->middleware('auth');
 
+// API routes for warna and stok
+Route::get('api/warna/{barang_id}', [BarangController::class, 'getWarna']);
+Route::get('api/stok/{barang_id}/{warna_id}', [StokController::class, 'getStokByBarangAndWarna']);
 
-Route::resource('barang', BarangController::class);
-
-
-Route::get('pelanggan/create-from-penjualan', [PelangganController::class, 'createFromPenjualan'])->name('pelanggan.createFromPenjualan');
-Route::post('pelanggan/store-from-penjualan', [PelangganController::class, 'storeFromPenjualan'])->name('pelanggan.storeFromPenjualan');
-Route::resource('pelanggan', PelangganController::class);
-
-
-Route::resource('pembelian', PembelianController::class);
-Route::resource('pembelian_item', PembelianItemController::class);
-Route::resource('pengirim', PengirimController::class);
-Route::resource('penjualan', PenjualanController::class);
-Route::resource('penjualan_item', PenjualanItemController::class);
-Route::resource('status', StatusController::class);
-
-Route::get('vendor/create-from-pembelian', [VendorController::class, 'createFromPembelian'])->name('vendor.createFromPembelian');
-Route::post('vendor/store-from-pembelian', [VendorController::class, 'storeFromPembelian'])->name('vendor.storeFromPembelian');
-Route::resource('vendor', VendorController::class);
-
-Route::resource('stok', StokController::class);
-Route::resource('warna', WarnaController::class);
-
-Route::model('penjualan_item', PenjualanItem::class);
-
-Route::post('/pembelian/storeWithItems', [PembelianController::class, 'storeWithItems'])->name('pembelian.storeWithItems');
-
-// Pembelian Routes
-Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian.index');
-Route::get('/pembelian/create', [PembelianController::class, 'create'])->name('pembelian.create');
-Route::post('/pembelian', [PembelianController::class, 'storeWithItems'])->name('pembelian.store');
-Route::get('/pembelian/{pembelian}', [PembelianController::class, 'show'])->name('pembelian.show');
-Route::get('/pembelian/{pembelian}/edit', [PembelianController::class, 'edit'])->name('pembelian.edit');
-Route::put('/pembelian/{pembelian}', [PembelianController::class, 'update'])->name('pembelian.update');
-Route::delete('/pembelian/{pembelian}', [PembelianController::class, 'destroy'])->name('pembelian.destroy');
-
-// Pembelian Item Routes
-Route::get('/pembelian_item', [PembelianItemController::class, 'index'])->name('pembelian_item.index');
-Route::get('/pembelian_item/create', [PembelianItemController::class, 'create'])->name('pembelian_item.create');
-Route::post('/pembelian_item', [PembelianItemController::class, 'store'])->name('pembelian_item.store');
-Route::get('/pembelian_item/{pembelian_item}', [PembelianItemController::class, 'show'])->name('pembelian_item.show');
-Route::get('/pembelian_item/{pembelian_item}/edit', [PembelianItemController::class, 'edit'])->name('pembelian_item.edit');
-Route::put('/pembelian_item/{pembelian_item}', [PembelianItemController::class, 'update'])->name('pembelian_item.update');
-Route::delete('/pembelian_item/{pembelian_item}', [PembelianItemController::class, 'destroy'])->name('pembelian_item.destroy');
-
-Route::post('barang/update-stock/{pembelian}', [BarangController::class, 'updateStockFromPembelian'])->name('barang.updateStockFromPembelian');
-Route::get('pembelian/{pembelian}/updateStatus/{status}', [PembelianController::class, 'updateStatus'])->name('pembelian.updateStatus');
-
-Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
-Route::get('/penjualan/create', [PenjualanController::class, 'create'])->name('penjualan.create');
-Route::post('/penjualan', [PenjualanController::class, 'storeWithItems'])->name('penjualan.store');
-Route::get('/penjualan/{penjualan}', [PenjualanController::class, 'show'])->name('penjualan.show');
-Route::get('/penjualan/{penjualan}/edit', [PenjualanController::class, 'edit'])->name('penjualan.edit');
-Route::put('/penjualan/{penjualan}', [PenjualanController::class, 'update'])->name('penjualan.update');
-Route::delete('/penjualan/{penjualan}', [PenjualanController::class, 'destroy'])->name('penjualan.destroy');
-Route::get('/penjualan/{penjualan}/updateStatus/{status}', [PenjualanController::class, 'updateStatus'])->name('penjualan.updateStatus');
-
-Route::post('penjualan/storeWithItems', [PenjualanController::class, 'storeWithItems'])->name('penjualan.storeWithItems');
-Route::get('penjualan/{penjualan}/status/{status}', [PenjualanController::class, 'updateStatus'])->name('penjualan.updateStatus');
-
-Route::get('/penjualan_item', [PenjualanItemController::class, 'index'])->name('penjualan_item.index');
-Route::get('/penjualan_item/create', [PenjualanItemController::class, 'create'])->name('penjualan_item.create');
-Route::post('/penjualan_item', [PenjualanItemController::class, 'store'])->name('penjualan_item.store');
-Route::get('/penjualan_item/{penjualan_item}', [PenjualanItemController::class, 'show'])->name('penjualan_item.show');
-Route::get('/penjualan_item/{penjualan_item}/edit', [PenjualanItemController::class, 'edit'])->name('penjualan_item.edit');
-Route::put('/penjualan_item/{penjualan_item}', [PenjualanItemController::class, 'update'])->name('penjualan_item.update');
-Route::delete('/penjualan_item/{penjualan_item}', [PenjualanItemController::class, 'destroy'])->name('penjualan_item.destroy');
-
-
-require __DIR__.'/auth.php';
-
+require __DIR__ . '/auth.php';

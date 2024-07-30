@@ -9,7 +9,7 @@ class StatusSeeder extends Seeder
 {
     public function run()
     {
-        $statuses = ['On Process', 'Payment', 'Cancel', 'Delivered'];
+        $statuses = ['On Process', 'Payment', 'Cancel', 'Delivered',];
 
         foreach ($statuses as $status) {
             Status::create(['nama_status' => $status]);

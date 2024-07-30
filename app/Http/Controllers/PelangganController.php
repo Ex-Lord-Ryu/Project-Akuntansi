@@ -7,9 +7,23 @@ use Illuminate\Http\Request;
 
 class PelangganController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pelanggan = Pelanggan::paginate(10);
+        $user = auth()->user();
+        $query = Pelanggan::where('user_id', $user->id);
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where('nama', 'like', '%' . $search . '%')
+                  ->orWhere('alamat', 'like', '%' . $search . '%')
+                  ->orWhere('tgl_lahir', 'like', '%' . $search . '%')
+                  ->orWhere('no_hp', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('wilayah', 'like', '%' . $search . '%')
+                  ->orWhere('provinsi', 'like', '%' . $search . '%');
+        }
+
+        $pelanggan = $query->paginate(10);
         return view('pelanggan.index', compact('pelanggan'));
     }
 
@@ -28,7 +42,16 @@ class PelangganController extends Controller
             'alamat' => 'required|string',
         ]);
 
-        Pelanggan::create($request->all());
+        Pelanggan::create([
+            'nama' => $request->nama,
+            'alamat' => $request->alamat,
+            'tgl_lahir' => $request->tgl_lahir,
+            'no_hp' => $request->no_hp,
+            'email' => $request->email,
+            'wilayah' => $request->wilayah,
+            'provinsi' => $request->provinsi,
+            'user_id' => auth()->id(), // Link the customer to the current user
+        ]);
 
         $redirectTo = session('pelanggan_create_from', route('pelanggan.index'));
         return redirect($redirectTo)->with('success', 'Pelanggan created successfully.');
@@ -80,7 +103,16 @@ class PelangganController extends Controller
             'provinsi' => 'required|string|max:255',
         ]);
 
-        Pelanggan::create($request->all());
+        Pelanggan::create([
+            'nama' => $request->nama,
+            'alamat' => $request->alamat,
+            'tgl_lahir' => $request->tgl_lahir,
+            'no_hp' => $request->no_hp,
+            'email' => $request->email,
+            'wilayah' => $request->wilayah,
+            'provinsi' => $request->provinsi,
+            'user_id' => auth()->id(), // Link the customer to the current user
+        ]);
 
         return redirect()->route('penjualan.create')->with('success', 'Pelanggan berhasil ditambahkan.');
     }

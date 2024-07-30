@@ -19,13 +19,17 @@ class PenjualanItem extends Model
         'no_rangka',
         'no_mesin',
         'harga',
+        'metode_pembayaran'
     ];
-
-    
 
     public function penjualan()
     {
         return $this->belongsTo(Penjualan::class, 'id_penjualan');
+    }
+
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class, 'id_barang');
     }
 
     public function stok()
@@ -33,8 +37,8 @@ class PenjualanItem extends Model
         return $this->belongsTo(Stok::class, 'id_stok');
     }
 
-    public function barang()
+    public function warna()
     {
-        return $this->belongsTo(Barang::class, 'id_barang');
+        return $this->belongsTo(Warna::class, 'id_warna');
     }
 }

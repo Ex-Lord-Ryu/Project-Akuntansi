@@ -2,19 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pembelian;
-use App\Models\PembelianItem;
-use App\Models\Barang;
 use App\Models\Warna;
+use App\Models\Barang;
+use App\Models\Pembelian;
 use Illuminate\Http\Request;
+use App\Models\PembelianItem;
 
 class PembelianItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pembelianItems = PembelianItem::with('barang', 'warna') ->orderBy('id', 'desc')->paginate(10);
+        $query = PembelianItem::query();
+
+        if ($request->has('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('created_at', 'like', '%' . $search . '%')
+                    ->orWhereHas('barang', function ($q) use ($search) {
+                        $q->where('nama', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('warna', function ($q) use ($search) {
+                        $q->where('warna', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        $pembelianItems = $query->with('barang', 'warna')->orderBy('id', 'desc')->paginate(10);
         return view('pembelian_item.index', compact('pembelianItems'));
     }
+
 
     public function create()
     {
@@ -75,9 +93,9 @@ class PembelianItemController extends Controller
 
     public function destroy($id)
     {
-        $pembelianItem = PembelianItem::findOrFail($id);
-        $pembelianItem->delete();
+        $item = PembelianItem::findOrFail($id);
+        $item->delete();
 
-        return redirect()->route('pembelian_item.index')->with('success', 'Pembelian item deleted successfully.');
+        return response()->json(['success' => true]);
     }
 }

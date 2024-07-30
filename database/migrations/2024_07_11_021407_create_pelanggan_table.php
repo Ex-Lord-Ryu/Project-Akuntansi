@@ -17,6 +17,7 @@ class CreatePelangganTable extends Migration
             $table->string('alamat', 255);
             $table->string('wilayah', 50);
             $table->string('provinsi', 50);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

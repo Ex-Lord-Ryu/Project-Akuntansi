@@ -6,77 +6,139 @@
     </x-slot>
 
     <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center mt-6">
-            <h1 class="text-2xl font-bold">Daftar Pelanggan</h1>
-            <a href="{{ route('pelanggan.create') }}" class="btn btn-light border-custom">Tambah Pelanggan</a>
-        </div>
-        <div class="flex justify-end mt-4">
-            <a href="{{ route('penjualan.index') }}" class="btn btn-light border-custom mr-2">Daftar Penjualan</a>
-        </div>
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
-        <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="w-full overflow-auto"> <!-- Added wrapper to enable horizontal scrolling -->
-                <table class="table-auto w-full">
+        @if (session('popup_error'))
+            <div class="alert alert-danger">
+                {{ session('popup_error') }}
+            </div>
+        @endif
+
+        <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="flex justify-end mb-4">
+                <form action="{{ route('pelanggan.index') }}" method="GET" class="flex items-center">
+                    <input type="text" name="search" placeholder="Cari pelanggan..." value="{{ request()->query('search') }}" class="form-input rounded-l border-0">
+                    <button type="submit" class="btn btn-light border-custom rounded-r ml-2">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                </form>
+            </div>
+            <div class="flex justify-between mb-4">
+                <div class="flex justify-start space-x-2">
+                    <button id="view-button" class="btn btn-light border-custom" disabled>
+                        <i class="fas fa-eye"></i> Lihat
+                    </button>
+                    <button id="edit-button" class="btn btn-light border-custom" disabled>
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button id="delete-button" class="btn btn-light border-custom" disabled>
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <a href="{{ route('penjualan.index') }}" class="btn btn-light border-custom">
+                        <i class="fas fa-list"></i> Penjualan
+                    </a>
+                    <a href="{{ route('pelanggan.create') }}" class="btn btn-light border-custom">
+                        <i class="fas fa-plus"></i> Pelanggan
+                    </a>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 text-center">
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                            <th class="px-4 py-2">ID</th>
-                            <th class="px-4 py-2">Nama</th>
-                            <th class="px-4 py-2">Tanggal Lahir</th>
-                            <th class="px-4 py-2">No HP</th>
-                            <th class="px-4 py-2">Email</th>
-                            <th class="px-4 py-2">Alamat</th>
-                            <th class="px-4 py-2">Wilayah</th>
-                            <th class="px-4 py-2">Provinsi</th>
-                            <th class="px-4 py-2">Aksi</th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama</th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tanggal Lahir</th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">No HP</th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Alamat</th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Wilayah</th>
+                            <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Provinsi</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200" id="table-body">
                         @foreach ($pelanggan as $item)
-                            <tr class="border-t">
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                                    style="max-width: 50px;">{{ $item->id }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                                    style="max-width: 150px;">{{ $item->nama }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                                    style="max-width: 100px;">{{ $item->tgl_lahir }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                                    style="max-width: 100px;">{{ $item->no_hp }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                                    style="max-width: 200px;">{{ $item->email }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                                    style="max-width: 200px;">{{ $item->alamat }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                                    style="max-width: 150px;">{{ $item->wilayah }}</td>
-                                <td class="px-4 py-2 text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                                    style="max-width: 150px;">{{ $item->provinsi }}</td>
-                                <td class="px-4 py-2 text-center">
-                                    <div class="flex flex-col items-center">
-                                        <a href="{{ route('pelanggan.show', $item->id) }}"
-                                            class="btn btn-dark mb-2 btn-action">Lihat</a>
-                                        <a href="{{ route('pelanggan.edit', $item->id) }}"
-                                            class="btn btn-dark mb-2 btn-action">Edit</a>
-                                        <form action="{{ route('pelanggan.destroy', $item->id) }}" method="POST"
-                                            class="MB-2" onclick="return confirmDelete()">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-Light btn-action">Hapus</button>
-                                        </form>
-                                    </div>
-                                </td>
+                            <tr data-id="{{ $item->id }}" class="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->id }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->nama }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->tgl_lahir }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->no_hp }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->email }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->alamat }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->wilayah }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->provinsi }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-                {{ $pelanggan->links() }} <!-- Add pagination links here -->
+            </div>
+            <div class="mt-4">
+                {{ $pelanggan->links() }}
             </div>
         </div>
     </div>
 </x-app-layout>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableBody = document.getElementById('table-body');
+        let selectedRowId = null;
+
+        tableBody.addEventListener('click', function (event) {
+            const rows = tableBody.getElementsByTagName('tr');
+            for (let row of rows) {
+                row.classList.remove('bg-blue-100', 'text-bold', 'border-l-4', 'border-blue-500');
+            }
+
+            const selectedRow = event.target.closest('tr');
+            selectedRow.classList.add('bg-blue-100', 'text-bold', 'border-l-4', 'border-blue-500');
+            selectedRowId = selectedRow.getAttribute('data-id');
+
+            document.getElementById('view-button').disabled = false;
+            document.getElementById('edit-button').disabled = false;
+            document.getElementById('delete-button').disabled = false;
+        });
+
+        document.getElementById('view-button').addEventListener('click', function () {
+            if (selectedRowId) {
+                window.location.href = `/pelanggan/${selectedRowId}`;
+            }
+        });
+
+        document.getElementById('edit-button').addEventListener('click', function () {
+            if (selectedRowId) {
+                window.location.href = `/pelanggan/${selectedRowId}/edit`;
+            }
+        });
+
+        document.getElementById('delete-button').addEventListener('click', function () {
+            if (selectedRowId) {
+                if (confirm('Data yang dihapus tidak dapat direstorasi?')) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/pelanggan/${selectedRowId}`;
+                    form.innerHTML = `
+                        @csrf
+                        @method('DELETE')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        });
+    });
+
     function confirmDelete() {
         return confirm('Data yang dihapus tidak dapat direstorasi?');
     }
 </script>
+
