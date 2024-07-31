@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Penjualan;
-use App\Models\PenjualanItem;
-use App\Models\Pelanggan;
-use App\Models\Pengirim;
-use App\Models\Status;
 use App\Models\Stok;
+use App\Models\Status;
+use App\Models\Pengirim;
+use App\Models\Pelanggan;
+use App\Models\Penjualan;
 use Illuminate\Http\Request;
+use App\Models\PenjualanItem;
+use Illuminate\Support\Facades\Log;
 
 class PenjualanController extends Controller
 {
@@ -21,14 +22,15 @@ class PenjualanController extends Controller
             $query->whereHas('pelanggan', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%");
             })
-                ->orWhereHas('pengirim', function ($q) use ($search) {
-                    $q->where('jenis', 'like', "%{$search}%");
-                })
-                ->orWhere('tgl_penjualan', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%");
+            ->orWhereHas('pengirim', function ($q) use ($search) {
+                $q->where('jenis', 'like', "%{$search}%");
+            })
+            ->orWhere('tgl_penjualan', 'like', "%{$search}%")
+            ->orWhere('id', 'like', "%{$search}%");
         }
 
         $penjualan = $query->paginate(10);
+
         return view('penjualan.index', compact('penjualan'));
     }
 
@@ -101,13 +103,15 @@ class PenjualanController extends Controller
         return $this->redirectTo();
     }
 
-    public function show(Penjualan $penjualan)
+    public function show($id)
     {
+        $penjualan = Penjualan::with('pelanggan', 'pengirim', 'status', 'penjualanItems')->findOrFail($id);
         return view('penjualan.show', compact('penjualan'));
     }
 
-    public function edit(Penjualan $penjualan)
+    public function edit($id)
     {
+        $penjualan = Penjualan::with('pelanggan', 'pengirim', 'status', 'penjualanItems')->findOrFail($id);
         $user = auth()->user();
         $pelanggans = Pelanggan::where('user_id', $user->id)->get(); // Filter customers by the logged-in user
         $pengirims = Pengirim::where('jenis', 'pick up')->get(); // Only include "pick up" option
@@ -116,10 +120,11 @@ class PenjualanController extends Controller
             ->where('harga', '>', 0)
             ->get()
             ->groupBy('barang.nama');
-        // Only get available stock with a non-zero price
-        $stokAvailable = Stok::where('status', 'available')->where('harga', '>', 0)->get();
+        $stokAvailable = Stok::where('status', 'available')->where('harga', '>', 0)->get(); // Only get available stock with a non-zero price
+    
         return view('penjualan.edit', compact('pelanggans', 'pengirims', 'statuses', 'stokAvailable', 'stokGrouped', 'penjualan'));
     }
+
 
     public function update(Request $request, Penjualan $penjualan)
     {
@@ -192,7 +197,7 @@ class PenjualanController extends Controller
     public function riwayatPenjualan()
     {
         $user = auth()->user();
-        
+
         if ($user->usertype === 'admin') {
             // Jika admin, tampilkan semua penjualan
             $penjualans = Penjualan::with('pelanggan', 'status', 'pengirim')->paginate(10);
@@ -202,11 +207,11 @@ class PenjualanController extends Controller
                 ->with('pelanggan', 'status', 'pengirim')
                 ->paginate(10);
         }
-    
+
         return view('penjualan.riwayat', compact('penjualans'));
     }
-    
-    
+
+
 
     private function redirectTo()
     {

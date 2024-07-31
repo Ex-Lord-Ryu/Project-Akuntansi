@@ -95,7 +95,7 @@
 </x-app-layout>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+ document.addEventListener('DOMContentLoaded', function() {
         const tableBody = document.getElementById('table-body');
         let selectedRowId = null;
         let selectedPenjualanId = null;
@@ -132,7 +132,7 @@
         document.getElementById('delete-button').addEventListener('click', function() {
             if (selectedRowId) {
                 if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
-                    fetch(`/penjualan-items/${selectedRowId}`, {
+                    fetch(`/penjualan_items/${selectedRowId}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -154,4 +154,5 @@
             }
         });
     });
+
 </script>

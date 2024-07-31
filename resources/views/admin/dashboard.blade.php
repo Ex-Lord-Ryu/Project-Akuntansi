@@ -27,13 +27,13 @@
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $userCount }}</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">Total Sales</td>
+                                <td class="px-6 py-4 whitespace-nowrap">Total Penjualan</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $penjualanCount }}</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200 mt-6">Sales Data</h3>
+                    <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200 mt-6">Data Penjualan</h3>
                     <div class="flex justify-between mb-4">
                         <form method="GET" action="{{ route('admin.dashboard') }}">
                             <select name="filter" class="form-select" onchange="this.form.submit()">
@@ -46,16 +46,54 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
                         <thead>
                             <tr>
-                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Year</th>
-                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ $filter === 'year' ? 'Month' : ($filter === 'month' ? 'Day' : 'Hour') }}</th>
-                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Count</th>
+                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    @if($filter === 'year')
+                                        Year
+                                    @elseif($filter === 'month')
+                                        Year
+                                    @elseif($filter === 'day')
+                                        Year
+                                    @endif
+                                </th>
+                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    @if($filter === 'year')
+                                        Month
+                                    @elseif($filter === 'month')
+                                        Month
+                                    @elseif($filter === 'day')
+                                        Month
+                                    @endif
+                                </th>
+                                @if($filter === 'month' || $filter === 'day')
+                                    <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        @if($filter === 'month')
+                                            Day
+                                        @elseif($filter === 'day')
+                                            Day
+                                        @endif
+                                    </th>
+                                @endif
+                                @if($filter === 'day')
+                                    <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Hour
+                                    </th>
+                                @endif
+                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Total Penjualan
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
                             @foreach ($penjualanMonthly as $monthly)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $monthly->year }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $filter === 'year' ? $monthly->month : ($filter === 'month' ? $monthly->day : $monthly->hour) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ date('F', mktime(0, 0, 0, $monthly->month, 10)) }}</td>
+                                    @if($filter === 'month' || $filter === 'day')
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $monthly->day }}</td>
+                                    @endif
+                                    @if($filter === 'day')
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $monthly->hour }}</td>
+                                    @endif
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $monthly->count }}</td>
                                 </tr>
                             @endforeach

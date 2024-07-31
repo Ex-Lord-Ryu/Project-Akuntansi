@@ -25,8 +25,7 @@
         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
             <div class="flex justify-end mb-4">
                 <form action="{{ route('penjualan.index') }}" method="GET" class="flex items-center">
-                    <input type="text" name="search" placeholder="Cari Penjualan..."
-                        value="{{ request()->query('search') }}" class="form-input rounded-l border-0">
+                    <input type="text" name="search" placeholder="Cari Penjualan..." value="{{ request()->query('search') }}" class="form-input rounded-l border-0">
                     <button type="submit" class="btn btn-light border-custom rounded-r ml-2">
                         <i class="fas fa-search"></i> Cari
                     </button>
@@ -60,33 +59,25 @@
                     <a href="{{ route('penjualan_item.index') }}" class="btn btn-light border-custom">
                         <i class="fas fa-list"></i> Penjualan Item
                     </a>
-                    {{-- <a href="{{ route('penjualan.create') }}" class="btn btn-light border-custom">
-                        <i class="fas fa-plus"></i> Penjualan
-                    </a> --}}
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th
-                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 ID
                             </th>
-                            <th
-                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Pelanggan
                             </th>
-                            <th
-                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Tanggal Penjualan
                             </th>
-                            <th
-                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Status
                             </th>
-                            <th
-                                class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs leading-4 font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Tanggal Penerimaan
                             </th>
                         </tr>
@@ -94,24 +85,23 @@
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200" id="table-body">
                         @foreach ($penjualan as $item)
                             <tr data-id="{{ $item->id }}" class="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <td
-                                    class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 dark:text-gray-100">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 dark:text-gray-100">
                                     {{ $item->id }}
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $item->pelanggan->nama }}
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900 dark:text-gray-100">
+                                    @if ($item->pelanggan)
+                                        {{ $item->pelanggan->nama }}
+                                    @else
+                                        <p>Nama pelanggan tidak tersedia</p>
+                                    @endif
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-500 dark:text-gray-300">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-500 dark:text-gray-300">
                                     {{ $item->tgl_penjualan }}
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-500 dark:text-gray-300 status-cell">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-500 dark:text-gray-300 status-cell">
                                     {{ $item->status->nama_status }}
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-500 dark:text-gray-300">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-500 dark:text-gray-300">
                                     {{ $item->tgl_penerimaan ?? 'N/A' }}
                                 </td>
                             </tr>
@@ -223,4 +213,5 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error:', error));
     }
 });
+
 </script>

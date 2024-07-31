@@ -16,10 +16,12 @@
             flex-direction: column;
             cursor: pointer;
         }
+
         .card-img-top {
             height: 200px;
             object-fit: cover;
         }
+
         .card-body {
             flex: 1;
         }
@@ -43,21 +45,22 @@
             <div class="row">
                 @foreach ($stokGrouped as $barangNama => $data)
                     <div class="col-md-4 mb-4">
-                        <div class="card h-100" onclick="window.location='{{ route('barang.detail', $data['items']->first()->id_barang) }}';">
-                            @php $item = $data['items']->first(); @endphp
-                            <img src="{{ asset('storage/' . $item->barang->image) }}" class="card-img-top" alt="{{ $barangNama }}" onerror="this.onerror=null;this.src='{{ asset('assets/images/default.jpg') }}';">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $barangNama }}</h5>
-                                <p class="card-text">Warna: {{ $data['colors'] }}</p>
-                                <p class="card-text">
-                                    Harga: 
-                                    @if ($data['latestPrice'] == 0)
-                                        -
-                                    @else
-                                        {{ 'Rp' . number_format($data['latestPrice'], 0, ',', '.') }}
-                                    @endif
-                                </p>
-                            </div>
+
+                        @php $item = $data['items']->first(); @endphp
+                        <img src="{{ asset('storage/' . $item->barang->image) }}" class="card-img-top"
+                            alt="{{ $barangNama }}"
+                            onerror="this.onerror=null;this.src='{{ asset('assets/images/default.jpg') }}';">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $barangNama }}</h5>
+                            <p class="card-text">Warna: {{ $data['colors'] }}</p>
+                            <p class="card-text">
+                                Harga:
+                                @if ($data['latestPrice'] == 0)
+                                    -
+                                @else
+                                    {{ 'Rp' . number_format($data['latestPrice'], 0, ',', '.') }}
+                                @endif
+                            </p>
                         </div>
                     </div>
                 @endforeach

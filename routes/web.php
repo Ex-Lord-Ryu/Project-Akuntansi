@@ -56,16 +56,17 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('vendor', VendorController::class);
         Route::resource('penjualan', PenjualanController::class)->except(['create', 'store']);
         Route::post('/penjualan/{penjualan}/status/{status}', [PenjualanController::class, 'updateStatus'])->name('penjualan.updateStatus');
-        Route::resource('pelanggan', PelangganController::class)->except(['create', 'store']);
         Route::resource('pembelian_item', PembelianItemController::class);
-        Route::resource('pembelian_items', PembelianItemController::class);
         Route::resource('pengirim', PengirimController::class);
-        Route::resource('penjualan_item', PenjualanItemController::class);
         Route::resource('status', StatusController::class);
         Route::resource('barang', BarangController::class);
         Route::resource('stok', StokController::class);
         Route::resource('warna', WarnaController::class);
     });
+
+    // Routes for both user and admin
+    Route::resource('penjualan_item', PenjualanItemController::class);
+    Route::resource('pelanggan', PelangganController::class)->except(['create', 'store']);
 });
 
 // Route for viewing barang details (auth middleware added)

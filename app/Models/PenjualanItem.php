@@ -27,6 +27,11 @@ class PenjualanItem extends Model
         return $this->belongsTo(Penjualan::class, 'id_penjualan');
     }
 
+    public function pelanggan()
+    {
+        return $this->belongsTo(Pelanggan::class, 'pelanggan_id');
+    }
+
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'id_barang');

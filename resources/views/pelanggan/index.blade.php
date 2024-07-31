@@ -43,9 +43,11 @@
                     </button>
                 </div>
                 <div class="flex justify-end space-x-2">
-                    <a href="{{ route('penjualan.index') }}" class="btn btn-light border-custom">
-                        <i class="fas fa-list"></i> Penjualan
-                    </a>
+                    @if(auth()->user()->usertype === 'admin')
+                        <a href="{{ route('penjualan.index') }}" class="btn btn-light border-custom">
+                            <i class="fas fa-list"></i> Penjualan
+                        </a>
+                    @endif
                     <a href="{{ route('pelanggan.create') }}" class="btn btn-light border-custom">
                         <i class="fas fa-plus"></i> Pelanggan
                     </a>
@@ -63,6 +65,9 @@
                             <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Alamat</th>
                             <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Wilayah</th>
                             <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Provinsi</th>
+                            @if(auth()->user()->usertype === 'admin')
+                                <th class="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Created By</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200" id="table-body">
@@ -76,6 +81,9 @@
                                 <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->alamat }}</td>
                                 <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->wilayah }}</td>
                                 <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->provinsi }}</td>
+                                @if(auth()->user()->usertype === 'admin')
+                                    <td class="px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{{ $item->user->name }}</td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
@@ -141,4 +149,3 @@
         return confirm('Data yang dihapus tidak dapat direstorasi?');
     }
 </script>
-

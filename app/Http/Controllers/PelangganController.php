@@ -10,17 +10,25 @@ class PelangganController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = Pelanggan::where('user_id', $user->id);
+        
+        // Check user type and modify query accordingly
+        if ($user->usertype === 'admin') {
+            $query = Pelanggan::query();
+        } else {
+            $query = Pelanggan::where('user_id', $user->id);
+        }
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where('nama', 'like', '%' . $search . '%')
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', '%' . $search . '%')
                   ->orWhere('alamat', 'like', '%' . $search . '%')
                   ->orWhere('tgl_lahir', 'like', '%' . $search . '%')
                   ->orWhere('no_hp', 'like', '%' . $search . '%')
                   ->orWhere('email', 'like', '%' . $search . '%')
                   ->orWhere('wilayah', 'like', '%' . $search . '%')
                   ->orWhere('provinsi', 'like', '%' . $search . '%');
+            });
         }
 
         $pelanggan = $query->paginate(10);
@@ -40,6 +48,11 @@ class PelangganController extends Controller
         $request->validate([
             'nama' => 'required|string',
             'alamat' => 'required|string',
+            'tgl_lahir' => 'required|date',
+            'no_hp' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:255',
+            'wilayah' => 'required|string|max:255',
+            'provinsi' => 'required|string|max:255',
         ]);
 
         Pelanggan::create([
@@ -72,6 +85,11 @@ class PelangganController extends Controller
         $request->validate([
             'nama' => 'required|string',
             'alamat' => 'required|string',
+            'tgl_lahir' => 'required|date',
+            'no_hp' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:255',
+            'wilayah' => 'required|string|max:255',
+            'provinsi' => 'required|string|max:255',
         ]);
 
         $pelanggan->update($request->all());

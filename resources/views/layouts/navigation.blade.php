@@ -111,12 +111,15 @@
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('pelanggan.index')" :active="request()->routeIs('pelanggan.index')">
+                            {{ __('Pelanggan') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('penjualan.create')" :active="request()->routeIs('penjualan.create')">
                             {{ __('Pembelian') }}
                         </x-nav-link>
                         <x-nav-link :href="route('penjualan.riwayat')" :active="request()->routeIs('penjualan.riwayat')">
                             {{ __('Riwayat Pembelian') }}
-                        </x-nav-link>
+                        </x-nav-link>             
                         <!-- Tambahkan link navigasi user lainnya di sini -->
                     @endif
                 </div>
@@ -181,6 +184,9 @@
             @else
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('pelanggan.index')" :active="request()->routeIs('pelanggan.index')">
+                    {{ __('Pelanggan') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('penjualan.create')" :active="request()->routeIs('penjualan.create')">
                     {{ __('Pembelian') }}
