@@ -10,7 +10,7 @@ class PelangganController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        
+
         // Check user type and modify query accordingly
         if ($user->usertype === 'admin') {
             $query = Pelanggan::query();
@@ -22,12 +22,12 @@ class PelangganController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', '%' . $search . '%')
-                  ->orWhere('alamat', 'like', '%' . $search . '%')
-                  ->orWhere('tgl_lahir', 'like', '%' . $search . '%')
-                  ->orWhere('no_hp', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%')
-                  ->orWhere('wilayah', 'like', '%' . $search . '%')
-                  ->orWhere('provinsi', 'like', '%' . $search . '%');
+                    ->orWhere('alamat', 'like', '%' . $search . '%')
+                    ->orWhere('tgl_lahir', 'like', '%' . $search . '%')
+                    ->orWhere('no_hp', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('wilayah', 'like', '%' . $search . '%')
+                    ->orWhere('provinsi', 'like', '%' . $search . '%');
             });
         }
 
@@ -54,6 +54,15 @@ class PelangganController extends Controller
             'wilayah' => 'required|string|max:255',
             'provinsi' => 'required|string|max:255',
         ]);
+
+        // Cek apakah pelanggan dengan nama dan email yang sama sudah ada
+        $existingPelanggan = Pelanggan::where('nama', $request->nama)
+            ->where('email', $request->email)
+            ->first();
+
+        if ($existingPelanggan) {
+            return redirect()->back()->withInput()->withErrors(['email' => 'Pelanggan dengan nama dan email yang sama sudah ada.']);
+        }
 
         Pelanggan::create([
             'nama' => $request->nama,
@@ -120,6 +129,15 @@ class PelangganController extends Controller
             'wilayah' => 'required|string|max:255',
             'provinsi' => 'required|string|max:255',
         ]);
+
+        // Cek apakah pelanggan dengan nama dan email yang sama sudah ada
+        $existingPelanggan = Pelanggan::where('nama', $request->nama)
+            ->where('email', $request->email)
+            ->first();
+
+        if ($existingPelanggan) {
+            return redirect()->back()->withInput()->withErrors(['email' => 'Pelanggan dengan nama dan email yang sama sudah ada.']);
+        }
 
         Pelanggan::create([
             'nama' => $request->nama,

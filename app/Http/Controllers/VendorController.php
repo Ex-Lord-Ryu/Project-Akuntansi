@@ -13,7 +13,7 @@ class VendorController extends Controller
 
         if ($request->has('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%')
-                  ->orWhere('alamat', 'like', '%' . $request->search . '%');
+                ->orWhere('alamat', 'like', '%' . $request->search . '%');
         }
 
         $vendors = $query->paginate(10);
@@ -68,7 +68,6 @@ class VendorController extends Controller
         return redirect()->route('vendor.index')->with('success', 'Vendor deleted successfully.');
     }
 
-    // Fungsi untuk menampilkan form vendor dari pembelian
     public function createFromPembelian()
     {
         return view('vendor.create_from_pembelian');

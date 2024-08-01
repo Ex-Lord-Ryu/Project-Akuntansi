@@ -43,7 +43,7 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="tgl_penjualan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Penjualan</label>
+                    <label for="tgl_penjualan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Pembelian</label>
                     <input type="date" name="tgl_penjualan" id="tgl_penjualan" class="form-control mt-1 block w-full @error('tgl_penjualan') is-invalid @enderror" value="{{ old('tgl_penjualan', date('Y-m-d')) }}" required>
                     @error('tgl_penjualan')
                         <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
@@ -150,6 +150,7 @@
 
 <script>
     let itemIndex = 0;
+    const addedItems = new Set(); // Track added items by their ID
 
     // Populate colors based on selected stock item
     document.getElementById('stok').addEventListener('change', function() {
@@ -194,6 +195,11 @@
         const itemNoRangka = selectedWarnaOption.getAttribute('data-no-rangka');
         const itemNoMesin = selectedWarnaOption.getAttribute('data-no-mesin');
 
+        if (addedItems.has(itemNoRangka + itemNoMesin)) {
+            alert('Barang ini Kehabisan Stok');
+            return;
+        }
+
         const itemsDiv = document.getElementById('items');
         const newItem = document.createElement('div');
         newItem.classList.add('item', 'mb-4');
@@ -226,11 +232,16 @@
         `;
         itemsDiv.appendChild(newItem);
         itemIndex++;
+        addedItems.add(itemNoRangka + itemNoMesin);
         $('#itemModal').modal('hide');
     });
 
     $(document).on('click', '.remove-item', function() {
-        $(this).closest('.item').remove();
+        const itemElement = $(this).closest('.item');
+        const noRangka = itemElement.find('input[name*="[no_rangka]"]').val();
+        const noMesin = itemElement.find('input[name*="[no_mesin]"]').val();
+        addedItems.delete(noRangka + noMesin);
+        itemElement.remove();
     });
 
     document.getElementById('penjualan-form').addEventListener('submit', function(event) {

@@ -22,18 +22,21 @@
             <form action="{{ route('vendor.storeFromPembelian') }}" method="POST">
                 @csrf
                 <div class="mb-4">
-                    <label for="nama" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama</label>
-                    <input type="text" name="nama" id="nama" class="form-control mt-1 block w-full" required>
+                    <label for="nama" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Vendor</label>
+                    <input type="text" name="nama" id="nama" class="form-control mt-1 block w-full @error('nama') is-invalid @enderror" value="{{ old('nama') }}" required>
+                    @error('nama')
+                        <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="alamat" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</label>
-                    <input type="text" name="alamat" id="alamat" class="form-control mt-1 block w-full" required>
+                    <label for="alamat" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat Vendor</label>
+                    <input type="text" name="alamat" id="alamat" class="form-control mt-1 block w-full @error('alamat') is-invalid @enderror" value="{{ old('alamat') }}" required>
+                    @error('alamat')
+                        <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
+                    @enderror
                 </div>
-                <div class="flex justify-between items-center">
-                    <a href="{{ route('pembelian.create') }}" class="btn btn-dark">Back</a>
-                    <div class="flex space-x-2">
-                        <button type="submit" class="btn btn-success">Simpan</button>
-                    </div>
+                <div class="flex justify-end mb-4">
+                    <button type="submit" class="btn btn-success">Simpan</button>
                 </div>
             </form>
         </div>

@@ -44,25 +44,24 @@
             <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">Available Stock</h3>
             <div class="row">
                 @foreach ($stokGrouped as $barangNama => $data)
-                    <div class="col-md-4 mb-4">
-
-                        @php $item = $data['items']->first(); @endphp
-                        <img src="{{ asset('storage/' . $item->barang->image) }}" class="card-img-top"
-                            alt="{{ $barangNama }}"
-                            onerror="this.onerror=null;this.src='{{ asset('assets/images/default.jpg') }}';">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $barangNama }}</h5>
-                            <p class="card-text">Warna: {{ $data['colors'] }}</p>
-                            <p class="card-text">
-                                Harga:
-                                @if ($data['latestPrice'] == 0)
-                                    -
-                                @else
-                                    {{ 'Rp' . number_format($data['latestPrice'], 0, ',', '.') }}
-                                @endif
-                            </p>
+                    @if ($data['latestPrice'] != 0)
+                        <div class="col-md-4 mb-4">
+                            @php $item = $data['items']->first(); @endphp
+                            <div class="card">
+                                <img src="{{ asset('storage/' . $item->barang->image) }}" class="card-img-top"
+                                    alt="{{ $barangNama }}"
+                                    onerror="this.onerror=null;this.src='{{ asset('assets/images/default.jpg') }}';">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $barangNama }}</h5>
+                                    <p class="card-text">Warna: {{ $data['colors'] }}</p>
+                                    <p class="card-text">
+                                        Harga:
+                                        {{ 'Rp' . number_format($data['latestPrice'], 0, ',', '.') }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </div>

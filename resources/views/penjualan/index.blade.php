@@ -25,7 +25,7 @@
         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
             <div class="flex justify-end mb-4">
                 <form action="{{ route('penjualan.index') }}" method="GET" class="flex items-center">
-                    <input type="text" name="search" placeholder="Cari Penjualan..." value="{{ request()->query('search') }}" class="form-input rounded-l border-0">
+                    <input type="text" name="search" placeholder="Cari Pelanggan" value="{{ request()->query('search') }}" class="form-input rounded-l border-0">
                     <button type="submit" class="btn btn-light border-custom rounded-r ml-2">
                         <i class="fas fa-search"></i> Cari
                     </button>
@@ -215,3 +215,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+

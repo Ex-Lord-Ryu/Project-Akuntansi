@@ -42,11 +42,11 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="mb-4">
+                {{-- <div class="mb-4">
                     <label for="tgl_penerimaan" class="block text-sm font-medium text-gray-700">Tanggal Penerimaan</label>
                     <input type="date" name="tgl_penerimaan" id="tgl_penerimaan" class="form-input mt-1 block w-full"
                         required>
-                </div>
+                </div> --}}
                 <div class="mb-4">
                     <label for="no_rangka" class="block text-sm font-medium text-gray-700 dark:text-gray-300">No Rangka</label>
                     <input type="text" name="no_rangka" id="no_rangka" value="{{ old('no_rangka', $stok->no_rangka) }}" minlength="17" class="form-control mt-1 block w-full" required>

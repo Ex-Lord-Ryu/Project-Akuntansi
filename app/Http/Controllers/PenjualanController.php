@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use \Illuminate\Support\Facades\Log;
 use App\Models\Stok;
 use App\Models\Status;
 use App\Models\Pengirim;
@@ -9,7 +10,8 @@ use App\Models\Pelanggan;
 use App\Models\Penjualan;
 use Illuminate\Http\Request;
 use App\Models\PenjualanItem;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PenjualanController extends Controller
 {
@@ -22,11 +24,11 @@ class PenjualanController extends Controller
             $query->whereHas('pelanggan', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%");
             })
-            ->orWhereHas('pengirim', function ($q) use ($search) {
-                $q->where('jenis', 'like', "%{$search}%");
-            })
-            ->orWhere('tgl_penjualan', 'like', "%{$search}%")
-            ->orWhere('id', 'like', "%{$search}%");
+                ->orWhereHas('pengirim', function ($q) use ($search) {
+                    $q->where('jenis', 'like', "%{$search}%");
+                })
+                ->orWhere('tgl_penjualan', 'like', "%{$search}%")
+                ->orWhere('id', 'like', "%{$search}%");
         }
 
         $penjualan = $query->paginate(10);
@@ -37,20 +39,23 @@ class PenjualanController extends Controller
     public function create()
     {
         $user = auth()->user();
-        $pelanggans = Pelanggan::where('user_id', $user->id)->get(); // Filter customers by the logged-in user
-        $pengirims = Pengirim::where('jenis', 'pick up')->get(); // Only include "pick up" option
+        $pelanggans = Pelanggan::where('user_id', $user->id)->get();
+        $pengirims = Pengirim::where('jenis', 'pick up')->get();
         $statuses = Status::all();
         $stokGrouped = Stok::where('status', 'available')
             ->where('harga', '>', 0)
             ->get()
             ->groupBy('barang.nama');
-        // Only get available stock with a non-zero price
-        $stokAvailable = Stok::where('status', 'available')->where('harga', '>', 0)->get();
-        return view('penjualan.create', compact('pelanggans', 'pengirims', 'statuses', 'stokAvailable', 'stokGrouped'));
+
+            $stokAvailable = Stok::where('status', 'available')->where('harga', '>', 0)->get();
+        return view('penjualan.create', compact('pelanggans', 'pengirims', 'statuses', 'stokGrouped', 'stokAvailable'));
     }
+
 
     public function storeWithItems(Request $request)
     {
+        Log::info('StoreWithItems: Request received', $request->all());
+    
         $validatedData = $request->validate([
             'id_pelanggan' => 'required|exists:pelanggan,id',
             'tgl_penjualan' => 'required|date',
@@ -64,16 +69,19 @@ class PenjualanController extends Controller
             'items.*.no_mesin' => 'required|string',
             'items.*.metode_pembayaran' => 'required|string',
         ]);
-
+    
+        Log::info('StoreWithItems: Validation passed', $validatedData);
+    
         // Check if the customer belongs to the logged-in user
         $customer = Pelanggan::where('id', $validatedData['id_pelanggan'])
             ->where('user_id', auth()->id())
             ->first();
-
+    
         if (!$customer) {
+            Log::error('StoreWithItems: Invalid customer');
             return redirect()->route('penjualan.create')->with('error', 'Pelanggan tidak valid.');
         }
-
+    
         $penjualan = Penjualan::create([
             'user_id' => auth()->id(),
             'id_pelanggan' => $validatedData['id_pelanggan'],
@@ -82,10 +90,12 @@ class PenjualanController extends Controller
             'id_pengirim' => $validatedData['id_pengirim'],
             'tgl_penerimaan' => $validatedData['tgl_penerimaan'],
         ]);
-
+    
+        Log::info('StoreWithItems: Penjualan created', ['penjualan_id' => $penjualan->id]);
+    
         foreach ($validatedData['items'] as $item) {
             $stok = Stok::find($item['stok_id']);
-
+    
             if ($stok && $stok->id_barang) {
                 PenjualanItem::create([
                     'id_penjualan' => $penjualan->id,
@@ -97,34 +107,29 @@ class PenjualanController extends Controller
                     'harga' => $item['harga'],
                     'metode_pembayaran' => $item['metode_pembayaran'],
                 ]);
+    
+                $stok->update(['status' => 'dipesan']);
+                Log::info('StoreWithItems: PenjualanItem created and stock updated', ['stok_id' => $stok->id]);
             }
         }
-
+    
         return $this->redirectTo();
     }
-
-    public function show($id)
-    {
-        $penjualan = Penjualan::with('pelanggan', 'pengirim', 'status', 'penjualanItems')->findOrFail($id);
-        return view('penjualan.show', compact('penjualan'));
-    }
-
+    
     public function edit($id)
     {
         $penjualan = Penjualan::with('pelanggan', 'pengirim', 'status', 'penjualanItems')->findOrFail($id);
         $user = auth()->user();
-        $pelanggans = Pelanggan::where('user_id', $user->id)->get(); // Filter customers by the logged-in user
-        $pengirims = Pengirim::where('jenis', 'pick up')->get(); // Only include "pick up" option
+        $pelanggans = Pelanggan::where('user_id', $user->id)->get();
+        $pengirims = Pengirim::where('jenis', 'pick up')->get();
         $statuses = Status::all();
         $stokGrouped = Stok::where('status', 'available')
             ->where('harga', '>', 0)
             ->get()
             ->groupBy('barang.nama');
-        $stokAvailable = Stok::where('status', 'available')->where('harga', '>', 0)->get(); // Only get available stock with a non-zero price
-    
-        return view('penjualan.edit', compact('pelanggans', 'pengirims', 'statuses', 'stokAvailable', 'stokGrouped', 'penjualan'));
+            $stokAvailable = Stok::where('status', 'available')->where('harga', '>', 0)->get();
+        return view('penjualan.edit', compact('pelanggans', 'pengirims', 'statuses', 'stokGrouped', 'penjualan', 'stokAvailable'));
     }
-
 
     public function update(Request $request, Penjualan $penjualan)
     {
@@ -135,7 +140,6 @@ class PenjualanController extends Controller
             'tgl_penerimaan' => 'required|date',
         ]);
 
-        // Check if the customer belongs to the logged-in user
         $customer = Pelanggan::where('id', $request->id_pelanggan)
             ->where('user_id', auth()->id())
             ->first();
@@ -164,62 +168,91 @@ class PenjualanController extends Controller
         return $this->redirectTo();
     }
 
-    public function destroy(Penjualan $penjualan)
-    {
-        foreach ($penjualan->penjualanItems as $item) {
-            $stok = Stok::find($item->id_stok);
-            $stok->status = 'available';
-            $stok->save();
-        }
-
-        $penjualan->delete();
-        return redirect()->route('penjualan.index')->with('success', 'Penjualan deleted successfully.');
-    }
-
-    public function updateStatus(Request $request, Penjualan $penjualan, $status)
-    {
-        if ($penjualan->id_status < $status) {
-            $previousStatus = $penjualan->id_status;
-            $penjualan->update(['id_status' => $status]);
-
-            if ($previousStatus != 4 && $status == 4) {
-                foreach ($penjualan->penjualanItems as $item) {
-                    $stok = Stok::find($item->id_stok);
-                    if ($stok) {
-                        $stok->update(['status' => 'sold']);
-                    }
-                }
-            }
-        }
-        return response()->json(['success' => true]);
-    }
-
-    public function riwayatPenjualan()
-    {
-        $user = auth()->user();
-
-        if ($user->usertype === 'admin') {
-            // Jika admin, tampilkan semua penjualan
-            $penjualans = Penjualan::with('pelanggan', 'status', 'pengirim')->paginate(10);
-        } else {
-            // Jika bukan admin, tampilkan penjualan milik user tersebut
-            $penjualans = Penjualan::where('user_id', $user->id)
-                ->with('pelanggan', 'status', 'pengirim')
-                ->paginate(10);
-        }
-
-        return view('penjualan.riwayat', compact('penjualans'));
-    }
-
-
-
     private function redirectTo()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         if ($user->usertype === 'admin') {
             return redirect()->route('penjualan.index')->with('success', 'Penjualan berhasil disimpan.');
         } else {
             return redirect()->route('dashboard')->with('success', 'Penjualan berhasil disimpan.');
         }
     }
+
+    public function show($id)
+    {
+        $penjualan = Penjualan::with('pelanggan', 'pengirim', 'status', 'penjualanItems')->findOrFail($id);
+        return view('penjualan.show', compact('penjualan'));
+    }
+
+    public function riwayatPenjualan()
+    {
+        $user = auth()->user();
+    
+        if ($user->usertype === 'admin') {
+            // Jika admin, tampilkan semua penjualan
+            $penjualans = Penjualan::with(['pelanggan', 'status', 'pengirim', 'penjualanItems.barang', 'penjualanItems.warna'])->paginate(10);
+        } else {
+            // Jika bukan admin, tampilkan penjualan milik user tersebut
+            $penjualans = Penjualan::where('user_id', $user->id)
+                ->with(['pelanggan', 'status', 'pengirim', 'penjualanItems.barang', 'penjualanItems.warna'])
+                ->paginate(10);
+        }
+    
+        return view('penjualan.riwayat', compact('penjualans'));
+    }
+
+
+    public function cancel($id)
+    {
+        $penjualan = Penjualan::findOrFail($id);
+
+        foreach ($penjualan->penjualanItems as $item) {
+            $stok = Stok::find($item->id_stok);
+            if ($stok) {
+                $stok->update([
+                    'status' => 'available',
+                    'user_id' => null,
+                ]);
+            }
+        }
+
+        $penjualan->delete();
+    }
+
+public function updateStatus(Request $request, $id, $status)
+{
+    $penjualan = Penjualan::with('penjualanItems')->findOrFail($id);
+
+    // Check if status is 4 and update stock status
+    if ($status == 4) {
+        $pelanggan = Pelanggan::find($penjualan->id_pelanggan);
+        if (!$pelanggan) {
+            return response()->json(['success' => false, 'message' => 'Pelanggan tidak ditemukan']);
+        }
+
+        foreach ($penjualan->penjualanItems as $item) {
+            $stok = Stok::find($item->id_stok);
+            if ($stok) {
+                // Ensure user_id exists in users table
+                $userExists = DB::table('users')->where('id', $pelanggan->user_id)->exists();
+                if ($userExists) {
+                    $stok->update([
+                        'status' => 'sold',
+                        'user_id' => $pelanggan->user_id,
+                    ]);
+                } else {
+                    return response()->json(['success' => false, 'message' => 'User ID tidak valid']);
+                }
+            }
+        }
+    }
+
+    // Update penjualan status
+    $penjualan->update([
+        'id_status' => $status,
+    ]);
+
+    return response()->json(['success' => true]);
+}
+
 }

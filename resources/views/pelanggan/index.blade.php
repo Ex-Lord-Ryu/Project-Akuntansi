@@ -48,9 +48,11 @@
                             <i class="fas fa-list"></i> Penjualan
                         </a>
                     @endif
-                    <a href="{{ route('pelanggan.create') }}" class="btn btn-light border-custom">
-                        <i class="fas fa-plus"></i> Pelanggan
-                    </a>
+                    @if (auth()->user()->usertype === 'user')
+                        <a href="{{ route('pelanggan.create') }}" class="btn btn-light border-custom">
+                            <i class="fas fa-plus"></i> Pelanggan
+                        </a>
+                    @endif
                 </div>
             </div>
             <div class="overflow-x-auto">

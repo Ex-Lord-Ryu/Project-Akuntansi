@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Log;
+use \Illuminate\Support\Facades\Log;
 use App\Models\Stok;
 use App\Models\Warna;
 use App\Models\Barang;
@@ -18,36 +18,31 @@ class PembelianController extends Controller
     public function index(Request $request)
     {
         $query = Pembelian::query();
-    
+
         if ($request->has('search')) {
             $search = $request->search;
-    
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', '%' . $search . '%')
-                  ->orWhere('tgl_pembelian', 'like', '%' . $search . '%')
-                  ->orWhereHas('vendor', function ($q) use ($search) {
-                      $q->where('nama', 'like', '%' . $search . '%');
-                  });
+                    ->orWhere('tgl_pembelian', 'like', '%' . $search . '%')
+                    ->orWhereHas('vendor', function ($q) use ($search) {
+                        $q->where('nama', 'like', '%' . $search . '%');
+                    });
             });
         }
-    
+
         $pembelian = $query->with('vendor', 'status')->orderBy('id', 'desc')->paginate(10);
         return view('pembelian.index', compact('pembelian'));
     }
-    
 
     public function create()
     {
         $vendors = Vendor::all();
         $statuses = Status::all();
-        $pengirims = Pengirim::where('jenis', 'Truck')->get(); // Only include "pick up" option
+        $pengirims = Pengirim::where('jenis', 'Truck')->get();
         $barangs = Barang::all();
         $warnas = Warna::all();
 
-        $pembelian = new Pembelian();
-        $pembelian->items = collect();
-
-        return view('pembelian.create', compact('vendors', 'statuses', 'pengirims', 'barangs', 'warnas', 'pembelian'));
+        return view('pembelian.create', compact('vendors', 'statuses', 'pengirims', 'barangs', 'warnas'));
     }
 
     public function storeWithItems(Request $request)
@@ -93,7 +88,7 @@ class PembelianController extends Controller
     {
         $pembelian = Pembelian::with('items')->findOrFail($id);
         $vendors = Vendor::all();
-        $pengirims = Pengirim::where('jenis', 'Truck')->get(); // Only include "pick up" option
+        $pengirims = Pengirim::where('jenis', 'Truck')->get();
         $statuses = Status::all();
         $barangs = Barang::all();
         $warnas = Warna::all();
@@ -103,37 +98,38 @@ class PembelianController extends Controller
 
     public function update(Request $request, Pembelian $pembelian)
     {
+        Log::info('Request Data:', $request->all());
+
         $validatedData = $request->validate([
             'id_pengirim' => 'nullable|exists:pengirims,id',
             'items' => 'required|array',
             'items.*.id' => 'nullable|exists:pembelian_item,id',
             'items.*.id_barang' => 'required|exists:barang,id',
             'items.*.id_warna' => 'nullable|exists:warna,id',
+            'items.*.harga' => 'required|integer|min:0',
         ]);
 
         $pembelian->update([
             'id_pengirim' => $validatedData['id_pengirim'],
         ]);
 
+        $itemIds = [];
+
         foreach ($validatedData['items'] as $itemData) {
-            if (isset($itemData['id'])) {
-                $item = PembelianItem::find($itemData['id']);
-                $item->update([
-                    'id_barang' => $itemData['id_barang'],
-                    'id_warna' => $itemData['id_warna'] ?? null,
-                ]);
-            } else {
-                PembelianItem::create([
-                    'id_pembelian' => $pembelian->id,
-                    'id_barang' => $itemData['id_barang'],
-                    'id_warna' => $itemData['id_warna'] ?? null,
-                ]);
-            }
+            Log::info('Processing item:', $itemData);
+
+            $item = isset($itemData['id']) ? PembelianItem::find($itemData['id']) : new PembelianItem();
+            $item->id_pembelian = $pembelian->id;
+            $item->id_barang = $itemData['id_barang'];
+            $item->id_warna = $itemData['id_warna'] ?? null;
+            $item->harga = $itemData['harga'];
+            $item->save();
+
+            Log::info($item->wasRecentlyCreated ? 'Created new item:' : 'Updated item in database:', $item->toArray());
+            $itemIds[] = $item->id;
         }
 
-        if ($pembelian->id_status == 4) {
-            $this->updateStokIfStatusDelivered($pembelian);
-        }
+        $pembelian->items()->whereNotIn('id', $itemIds)->delete();
 
         return redirect()->route('pembelian.index')->with('success', 'Pembelian updated successfully.');
     }
@@ -149,12 +145,10 @@ class PembelianController extends Controller
 
             $pembelian->update(['id_status' => $status]);
 
-            // Perbarui stok jika status menjadi dikirim
             if ($status == 4) {
                 $this->updateStokIfStatusDelivered($pembelian);
             }
 
-            // Ambil nama status baru
             $newStatusName = $pembelian->status->nama_status;
 
             return response()->json(['success' => true, 'newStatusName' => $newStatusName]);

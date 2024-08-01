@@ -37,7 +37,7 @@
                 </div>
                 <div class="flex justify-end space-x-2">
                     <form action="{{ route('stok.index') }}" method="GET" class="flex items-center">
-                        <input type="text" name="search" placeholder="Cari nama barang, no rangka, no mesin..."
+                        <input type="text" name="search" placeholder="Cari nama motor"
                             value="{{ request()->query('search') }}" class="form-input rounded-l border-0">
                         <button type="submit" class="btn btn-light border-custom rounded-r ml-2">
                             <i class="fas fa-search"></i> Cari

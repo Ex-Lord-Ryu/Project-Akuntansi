@@ -44,7 +44,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="tgl_pembelian" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Pembelian</label>
-                    <input type="date" name="tgl_pembelian" id="tgl_pembelian" class="form-control mt-1 block w-full @error('tgl_pembelian') is-invalid @enderror" value="{{ old('tgl_pembelian') }}" required>
+                    <input type="date" name="tgl_pembelian" id="tgl_pembelian" class="form-control mt-1 block w-full @error('tgl_pembelian') is-invalid @enderror" value="{{ old('tgl_pembelian', date('Y-m-d')) }}" required>
                     @error('tgl_pembelian')
                         <div class="alert alert-danger mt-2 text-red-600">{{ $message }}</div>
                     @enderror

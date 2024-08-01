@@ -64,7 +64,7 @@
                             </div>
                             <div class="mb-4">
                                 <label for="items[{{ $index }}][harga]" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga</label>
-                                <input type="number" name="items[{{ $index }}][harga]" id="items[{{ $index }}][harga]" class="form-control mt-1 block w-full" min="0" step="1" required value="{{ $item->harga }}">
+                                <input type="text" name="items[{{ $index }}][harga]" id="items[{{ $index }}][harga]" class="form-control mt-1 block w-full harga-input" required value="{{ number_format($item->harga, 0, ',', '.') }}">
                             </div>
                             <div class="flex justify-end mb-4">
                                 <button type="button" class="btn btn-danger remove-item">Hapus Item</button>
@@ -170,6 +170,7 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Warna</label>
                     <div class="input-group">
+                        <input type="hidden" name="items[${itemIndex}][id_warna]" class="warna-id-input">
                         <input type="text" name="items[${itemIndex}][warna]" class="form-control mt-1 block w-full warna-input" value="" readonly>
                         <div class="input-group-append">
                             <button type="button" class="btn btn-primary select-warna-button" data-index="${itemIndex}">Pilih Warna</button>
@@ -196,10 +197,17 @@
 
         $(document).on('click', '.select-warna', function () {
             const warna = $(this).data('warna');
+            const warnaId = $(this).data('id');
             const index = selectedItemIndex;
             const warnaInput = document.querySelector(`input[name="items[${index}][warna]"]`);
-            warnaInput.value = warna;
-            $('#warnaModal').modal('hide');
+            const warnaIdInput = document.querySelector(`input[name="items[${index}][id_warna]"]`);
+            if (warnaInput && warnaIdInput) {
+                warnaInput.value = warna;
+                warnaIdInput.value = warnaId;
+                $('#warnaModal').modal('hide');
+            } else {
+                console.error('Warna input not found for index:', index);
+            }
         });
 
         document.getElementById('items').addEventListener('click', function(e) {
@@ -209,19 +217,36 @@
         });
 
         document.getElementById('pembelian-form').addEventListener('submit', function(event) {
-            const tglPembelian = document.getElementById('tgl_pembelian').value;
-            const tglPengiriman = document.getElementById('tgl_pengiriman').value;
+            const tglPembelian = document.getElementById('tgl_pembelian');
+            const tglPengiriman = document.getElementById('tgl_pengiriman');
 
-            if (tglPengiriman && tglPengiriman < tglPembelian) {
+            if (tglPengiriman && tglPengiriman.value && tglPengiriman.value < tglPembelian.value) {
                 event.preventDefault();
                 alert('Tanggal Pengiriman tidak boleh sebelum Tanggal Pembelian.');
+                return;
             }
 
             // Convert formatted prices to integers
             const hargaInputs = document.querySelectorAll('.harga-input');
+            let allValid = true;
             hargaInputs.forEach(input => {
-                input.value = parseInt(input.value.replace(/[^0-9]/g, ''), 10);
+                const originalValue = input.value;
+                const intValue = parseInt(input.value.replace(/[^0-9]/g, ''), 10);
+                console.log('Before conversion:', originalValue); // Log before conversion
+                console.log('After conversion:', intValue); // Log after conversion
+                input.value = intValue;
+
+                // Check if conversion was successful
+                if (isNaN(intValue)) {
+                    alert('Invalid price value: ' + originalValue);
+                    allValid = false;
+                }
             });
+
+            // If any value is invalid, prevent form submission
+            if (!allValid) {
+                event.preventDefault();
+            }
         });
 
         document.addEventListener('input', function(e) {
@@ -247,19 +272,23 @@
         }
 
         // Search functionality
-        document.getElementById('search-barang').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const cards = document.querySelectorAll('#barang-list .col-md-4');
+        const searchBarang = document.getElementById('search-barang');
+        if (searchBarang) {
+            searchBarang.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const cards = document.querySelectorAll('#barang-list .col-md-4');
 
-            cards.forEach(card => {
-                const cardTitle = card.querySelector('.card-title').textContent.toLowerCase();
-                if (cardTitle.includes(searchTerm)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
+                cards.forEach(card => {
+                    const cardTitle = card.querySelector('.card-title');
+                    if (cardTitle && cardTitle.textContent.toLowerCase().includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
             });
-        });
+        } else {
+            console.error('Search bar element not found');
+        }
     });
 </script>
-

@@ -27,9 +27,9 @@
                     <button id="edit-button" class="btn btn-light border-custom" disabled>
                         <i class="fas fa-edit"></i> Edit
                     </button>
-                    <button id="delete-button" class="btn btn-light border-custom" disabled>
+                    {{-- <button id="delete-button" class="btn btn-light border-custom" disabled>
                         <i class="fas fa-trash"></i> Hapus
-                    </button>
+                    </button> --}}
                 </div>
                 <div class="flex justify-end space-x-2">
                     <a href="{{ route('pembelian.index') }}" class="btn btn-light border-custom">

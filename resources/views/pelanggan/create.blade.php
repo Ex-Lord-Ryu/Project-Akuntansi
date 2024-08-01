@@ -5,6 +5,8 @@
         </h2>
     </x-slot>
 
+    <link rel="stylesheet" href="{{ asset('assets/css/btn.css') }}">
+
     <div class="container mx-auto px-4">
         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
             <form action="{{ route('pelanggan.store') }}" method="POST">
